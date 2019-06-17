@@ -25,7 +25,6 @@ class CreateEstructurasTable extends Migration
             $table->boolean('actividad');
             $table->boolean('obra');
 
-            $table->primary('id');
         });
     }
 

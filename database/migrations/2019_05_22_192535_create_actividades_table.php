@@ -28,7 +28,6 @@ class CreateActividadesTable extends Migration
             $table->boolean('ejecutada');
             $table->boolean('cancelada');
 
-            $table->primary('id');
             $table->foreign('producto_id')->references('id')->on('productos');
         });
     }

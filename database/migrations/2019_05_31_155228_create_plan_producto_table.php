@@ -20,7 +20,6 @@ class CreatePlanProductoTable extends Migration
             $table->bitInteger('producto_id');
             $table->integer('meta');
 
-            $table->primary('id');
             $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
             $table->foreign('producto_id')->references('id')->on('productos');
         });

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateInsumosTable extends Migration
+class CreateEspecificacionesSolicitudsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,17 @@ class CreateInsumosTable extends Migration
      */
     public function up()
     {
-        Schema::create('insumos', function (Blueprint $table) {
+        Schema::create('especificaciones_solicituds', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('clasificador_id', 5);
             $table->timestamps();
-            $table->string('nombre', 45);
+            $table->bigInteger('solicitud_id');
+            $table->integer('item')->nullable(false);
+            $table->string('codigo', 5)->nullable(false);
+            $table->string('descripcion', 100)->nullable(false);
             $table->integer('unidad_medida_id');
+            $table->float('cantidad', 8, 2)->nullable(false);
 
-            $table->foreign('clasificador_id')->references('id')->on('clasificadors');
+            $table->foreign('solicitud_id')->references('id')->on('solicituds');
             $table->foreign('unidad_medida_id')->references('id')->on('unidad_medidas');
         });
     }
@@ -32,6 +35,6 @@ class CreateInsumosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('insumos');
+        Schema::dropIfExists('especificaciones_solicituds');
     }
 }

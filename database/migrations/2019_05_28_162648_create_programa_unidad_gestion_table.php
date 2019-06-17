@@ -19,7 +19,6 @@ class CreateProgramaUnidadGestionTable extends Migration
             $table->integer('programa_id');
             $table->integer('unidad_gestion_id');
 
-            $table->primary('id');
             $table->foreign('programa_id')->references('id')->on('programas')->onDelete('cascade');
             $table->foreign('unidad_gestion_id')->references('id')->on('unidad_gestions')->onDelete('cascade');
         });

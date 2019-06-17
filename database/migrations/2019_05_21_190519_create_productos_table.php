@@ -22,7 +22,6 @@ class CreateProductosTable extends Migration
             $table->string('formula', 200);
             $table->integer('unidad_medida_id');
 
-            $table->primary('id');
             $table->foreign('resultado_id')->references('id')->on('resultados')->onDelete('cascade');
             $table->foreign('unidad_medida_id')->references('id')->on('unidad_medidas');
         });

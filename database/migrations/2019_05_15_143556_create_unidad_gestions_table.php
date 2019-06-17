@@ -21,7 +21,6 @@ class CreateUnidadGestionsTable extends Migration
             $table->boolean('direccion_coordinacion');
             $table->integer('unidad_gestion_id');
 
-            $table->primary('id');
             $table->foreign('estructura_id')->references('id')->on('estructuras')->onDelete('cascade');
         });
     }

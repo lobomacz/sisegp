@@ -20,7 +20,6 @@ class CreateActividadPlanProductoTable extends Migration
             $table->bigInteger('actividad_id');
             $table->date('fecha_programada');
 
-            $table->primary('id');
             $table->foreign('plan_producto_id')->references('id')->on('plan_producto')->onDelete('cascade');
             $table->foreign('actividad_id')->references('id')->on('actividades');
         });

@@ -25,7 +25,6 @@ class CreateProyectosTable extends Migration
             $table->boolean('en_ejecucion');
             $table->boolean('ejecutado');
 
-            $table->primary('id');
             $table->foreign('programa_id')->references('id')->on('programas')->onDelete('cascade');
             $table->unique('codigo_proyecto');
         });

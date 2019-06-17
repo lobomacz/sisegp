@@ -19,8 +19,6 @@ class CreateUnidadMedidasTable extends Migration
             $table->char('abreviatura', 5);
             $table->string('descripcion', 45);
             $table->enum('tipo_escala', ['peso', 'fluido', 'longitud', 'volumen', 'energia', 'otro']);
-
-            $table->primary('id');
         });
     }
 

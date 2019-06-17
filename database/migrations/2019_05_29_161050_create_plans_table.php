@@ -26,7 +26,6 @@ class CreatePlansTable extends Migration
             $table->boolean('activo');
             $table->boolean('cerrado');
 
-            $table->primary('id');
             $table->foreign('periodo_id')->references('id')->on('periodos')->onDelete('cascade');
             $table->foreign('unidad_gestion_id')->references('id')->on('unidad_gestions')->onDelete('cascade');
         });

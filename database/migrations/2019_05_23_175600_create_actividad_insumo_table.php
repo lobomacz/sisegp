@@ -24,7 +24,6 @@ class CreateActividadInsumoTable extends Migration
             $table->boolean('solicitado');
             $table->boolean('utilizado');
 
-            $table->primary('id');
             $table->foreign('actividad_id')->references('id')->on('actividades')->onDelete('cascade');
             $table->foreign('insumo_id')->references('id')->on('insumos');
             $table->foreign('unidad_medida_id')->references('id')->on('unidad_medidas');

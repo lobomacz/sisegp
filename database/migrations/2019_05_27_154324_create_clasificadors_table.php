@@ -22,6 +22,8 @@ class CreateClasificadorsTable extends Migration
             $table->boolean('subgrupo');
             $table->boolean('renglon');
             $table->boolean('subrenglon');
+
+            $table->primary('id');
         });
     }
 
