@@ -6,10 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Solicitud extends Model
 {
-    //
 
     public function solicitante(){
     	return $this->belongsTo('App/Models/Funcionario');
+    }
+
+    public function unidadGestion(){
+        return $this->belongsTo('App/Models/UnidadGestion');
     }
 
     public function actividadInsumo(){

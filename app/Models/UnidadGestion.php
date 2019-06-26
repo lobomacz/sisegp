@@ -16,6 +16,10 @@ class UnidadGestion extends Model
     	return $this->hasMany('App/Models/UnidadGestion');
     }
 
+    public function allDependencias(){
+        return $this->dependencias()->with('allDependencias');
+    }
+
     public function programas(){
     	return $this->belongsToMany('App/Models/Programa');
     }
@@ -26,5 +30,9 @@ class UnidadGestion extends Model
 
     public function planes(){
         return $this->hasMany('App/Models/Plan');
+    }
+
+    public function solicitudes(){
+        return $this->hasMany('App/Models/Solicitud');
     }
 }

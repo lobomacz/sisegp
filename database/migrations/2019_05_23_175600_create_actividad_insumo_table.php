@@ -15,7 +15,6 @@ class CreateActividadInsumoTable extends Migration
     {
         Schema::create('actividad_insumo', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->timestamps();
             $table->bigInteger('actividad_id');
             $table->bigInteger('insumo_id');
             $table->integer('unidad_medida_id');
@@ -23,6 +22,7 @@ class CreateActividadInsumoTable extends Migration
             $table->decimal('cantidad', 9, 2);
             $table->boolean('solicitado');
             $table->boolean('utilizado');
+            $table->timestamps();
 
             $table->foreign('actividad_id')->references('id')->on('actividades')->onDelete('cascade');
             $table->foreign('insumo_id')->references('id')->on('insumos');

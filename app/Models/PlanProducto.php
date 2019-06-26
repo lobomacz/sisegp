@@ -17,7 +17,7 @@ class PlanProducto extends Model
     	return $this->belongsTo('App/Models/Producto');
     }
 
-    public function actividadPlanProductos(){
+    public function actividadesPlanProductos(){
     	return $this->hasMany('App/Models/ActividadPlanProducto');
     }
 

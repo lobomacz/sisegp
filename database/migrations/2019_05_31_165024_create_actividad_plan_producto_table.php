@@ -15,10 +15,10 @@ class CreateActividadPlanProductoTable extends Migration
     {
         Schema::create('actividad_plan_producto', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->timestamps();
             $table->bigInteger('plan_producto_id');
             $table->bigInteger('actividad_id');
             $table->date('fecha_programada');
+            $table->timestamps();
 
             $table->foreign('plan_producto_id')->references('id')->on('plan_producto')->onDelete('cascade');
             $table->foreign('actividad_id')->references('id')->on('actividades');

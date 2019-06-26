@@ -15,11 +15,11 @@ class CreateDocumentosTable extends Migration
     {
         Schema::create('documentos', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->timestamps();
             $table->string('nombre', 50)->nullable(false);
             $table->string('url', 200)->nullable(false);
             $table->string('descripcion', 100);
             $table->enum('tipo_documento', ['pdf', 'word', 'excel']);
+            $table->timestamps();
         });
     }
 

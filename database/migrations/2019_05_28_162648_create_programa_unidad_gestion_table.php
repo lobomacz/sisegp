@@ -15,9 +15,9 @@ class CreateProgramaUnidadGestionTable extends Migration
     {
         Schema::create('programa_unidad_gestion', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->timestamps();
             $table->integer('programa_id');
             $table->integer('unidad_gestion_id');
+            $table->timestamps();
 
             $table->foreign('programa_id')->references('id')->on('programas')->onDelete('cascade');
             $table->foreign('unidad_gestion_id')->references('id')->on('unidad_gestions')->onDelete('cascade');

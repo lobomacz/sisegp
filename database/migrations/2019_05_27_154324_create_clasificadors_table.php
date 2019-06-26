@@ -15,13 +15,13 @@ class CreateClasificadorsTable extends Migration
     {
         Schema::create('clasificadors', function (Blueprint $table) {
             $table->string('id', 5);
-            $table->timestamps();
             $table->string('clasificador_id', 5);
             $table->string('denominacion')->nullable(false);
             $table->boolean('grupo');
             $table->boolean('subgrupo');
             $table->boolean('renglon');
             $table->boolean('subrenglon');
+            $table->timestamps();
 
             $table->primary('id');
         });

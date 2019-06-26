@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class ActividadInsumo extends Model
 {
-    //
-
     protected $table = 'actividad_insumo';
 
     public function unidadMedida(){
@@ -18,7 +16,4 @@ class ActividadInsumo extends Model
     	return $this->belongsTo('App/Models/Insumo');
     }
 
-    public function actividad(){
-    	return $this->belongsTo('App/Models/Actividad');
-    }
 }

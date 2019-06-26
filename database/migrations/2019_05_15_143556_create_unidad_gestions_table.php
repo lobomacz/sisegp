@@ -17,9 +17,9 @@ class CreateUnidadGestionsTable extends Migration
             $table->increments('id');
             $table->integer('estructura_id');
             $table->string('nombre', 100)->nullable(false);
-            $table->timestamps();
             $table->boolean('direccion_coordinacion');
             $table->integer('unidad_gestion_id');
+            $table->timestamps();
 
             $table->foreign('estructura_id')->references('id')->on('estructuras')->onDelete('cascade');
         });

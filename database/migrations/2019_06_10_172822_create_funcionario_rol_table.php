@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateFuncionarioRolsTable extends Migration
+class CreateFuncionarioRolTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class CreateFuncionarioRolsTable extends Migration
      */
     public function up()
     {
-        Schema::create('funcionario_rols', function (Blueprint $table) {
+        Schema::create('funcionario_rol', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->timestamps();
             $table->integer('funcionario_id');
             $table->integer('rol_id');
+            $table->timestamps();
 
             $table->foreign('funcionario_id')->references('id')->on('funcionarios')->onDelete('cascade');
             $table->foreign('ron_id')->references('id')->on('rols');
@@ -31,6 +31,6 @@ class CreateFuncionarioRolsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('funcionario_rols');
+        Schema::dropIfExists('funcionario_rol');
     }
 }

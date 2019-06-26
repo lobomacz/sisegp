@@ -15,10 +15,10 @@ class CreateUnidadMedidasTable extends Migration
     {
         Schema::create('unidad_medidas', function (Blueprint $table) {
             $table->increments('id');
-            $table->timestamps();
             $table->char('abreviatura', 5);
             $table->string('descripcion', 45);
-            $table->enum('tipo_escala', ['peso', 'fluido', 'longitud', 'volumen', 'energia', 'otro']);
+            $table->enum('tipo_unidad', ['peso', 'fluido', 'longitud', 'volumen', 'energia', 'otro']);
+            $table->timestamps();
         });
     }
 

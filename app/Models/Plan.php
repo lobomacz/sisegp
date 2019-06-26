@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Plan extends Model
 {
-    //
     public function periodos(){
     	return $this->belongsTo('App/Models/Periodo');
     }
@@ -19,7 +18,20 @@ class Plan extends Model
     	return $this->hasMany('App/Models/PlanProducto');
     }
 
+    public function planResultados(){
+        return $this->hasMany('App/Models/PlanResultado');
+    }
+
+    public function resultados(){
+        return $this->belongsToMany('App/Models/Resultado');
+    }
+
     public function productos(){
     	return $this->belongsToMany('App/Models/Producto');
     }
+
+    public function serviciosPersonales(){
+        return $this->hasMany('App/Models/ServicioPersonal');
+    }
+
 }

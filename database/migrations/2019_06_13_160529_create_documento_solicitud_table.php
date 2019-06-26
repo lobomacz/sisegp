@@ -15,9 +15,9 @@ class CreateDocumentoSolicitudTable extends Migration
     {
         Schema::create('documento_solicitud', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->timestamps();
             $table->bigInteger('documento_id');
             $table->bigInteger('solicitud_id');
+            $table->timestamps();
 
             $table->foreign('documento_id')->references('id')->on('documentos')->onDelete('cascade');
             $table->foreign('solicitud_id')->references('id')->on('solicituds')->onDelete('cascade');

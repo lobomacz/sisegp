@@ -15,7 +15,6 @@ class CreateFuncionariosTable extends Migration
     {
         Schema::create('funcionarios', function (Blueprint $table) {
             $table->increments('id');
-            $table->timestamps();
             $table->string('cedula', 16)->nullable(false);
             $table->string('primer_nombre',25)->nullable(false);
             $table->string('segundo_nombre', 25);
@@ -26,9 +25,11 @@ class CreateFuncionariosTable extends Migration
             $table->integer('unidad_gestion_id');
             $table->string('cargo', 25);
             $table->string('correo', 25)->nullable(false);
+            $table->timestamps();
 
             $table->foreign('unidad_gestion_id')->references('id')->on('unidad_gestion');
             $table->unique('correo');
+            $table->unique('cedula');
         });
     }
 

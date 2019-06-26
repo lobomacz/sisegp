@@ -15,7 +15,6 @@ class CreateEstructurasTable extends Migration
     {
         Schema::create('estructuras', function (Blueprint $table) {
             $table->increments('id');
-            $table->timestamps();
             $table->char('codigo', 3)
             $table->integer('estructura_id');
             $table->string('nombre', 150)->nullable(false);
@@ -24,7 +23,7 @@ class CreateEstructurasTable extends Migration
             $table->boolean('proyecto');
             $table->boolean('actividad');
             $table->boolean('obra');
-
+            $table->timestamps();
         });
     }
 

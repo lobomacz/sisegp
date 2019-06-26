@@ -15,9 +15,9 @@ class CreateProyectoUnidadGestionTable extends Migration
     {
         Schema::create('proyecto_unidad_gestion', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->timestamps();
             $table->bigInteger('proyecto_id');
             $table->integer('unidad_gestion_id');
+            $table->timestamps();
 
             $table->foreign('proyecto_id')->references('id')->on('proyectos')->onDelete('cascade');
             $table->foreign('unidad_gestion_id')->references('id')->on('unidad_gestions')->onDelete('cascade');

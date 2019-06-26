@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Periodo extends Model
 {
-    //
     protected $keyType = 'string';
 
     public function periodoAnterior(){

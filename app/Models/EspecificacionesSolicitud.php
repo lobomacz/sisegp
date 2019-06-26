@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class EspecificacionesSolicitud extends Model
 {
-    //
 
     public function solicitud(){
     	return $this->belongsTo('App/Models/Solicitud');

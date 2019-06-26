@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Clasificador extends Model
 {
-    //
-
     protected $keyType = 'string';
 
     public function children(){

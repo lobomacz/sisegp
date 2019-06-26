@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Insumo extends Model
 {
-    //
-
     public function actividades(){
     	return $this->belognsToMany('App/Models/Actividad');
     }

@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Rol extends Model
 {
-    //
     public function funcionarios(){
     	return $this->belongsToMany('App/Models/Funcionario');
     }

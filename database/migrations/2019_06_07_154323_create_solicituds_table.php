@@ -15,7 +15,6 @@ class CreateSolicitudsTable extends Migration
     {
         Schema::create('solicituds', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->timestamps();
             $table->enum('tipo_solicitud', ['gastos','proceso por concurso', 'proceso de ejecución de obra', 'compra menor para bienes', 'compra menor para servicios'])->nullable(false);
             $table->integer('unidad_gestion_id');
             $table->bigInteger('actividad_insumo_id');
@@ -35,6 +34,7 @@ class CreateSolicitudsTable extends Migration
             $table->dateTime('fecha_hora_presupuesto');
             $table->dateTime('fecha_hora_autorizado');
             $table->dateTime('fecha_hora_aceptado');
+            $table->timestamps();
 
             $table->foreign('actividad_insumo_id')->references('id')->on('actividad_insumo');
             $table->foreign('funcionario_id')->references('id')->on('funcionarios');

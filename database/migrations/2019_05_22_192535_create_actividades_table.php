@@ -15,7 +15,6 @@ class CreateActividadesTable extends Migration
     {
         Schema::create('actividades', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->timestamps();
             $table->bigInteger('producto_id');
             $table->string('codigo', 9);
             $table->string('descripcion', 600);
@@ -23,10 +22,11 @@ class CreateActividadesTable extends Migration
             $table->decimal('monto_presupuesto', 11, 2);
             $table->decimal('monto_aprobado', 11, 2);
             $table->decimal('monto_disponible', 11, 2);
-            $table->boolean('solicitada');
             $table->boolean('aprobada');
             $table->boolean('ejecutada');
             $table->boolean('cancelada');
+            $table->boolean('informe');
+            $table->timestamps();
 
             $table->foreign('producto_id')->references('id')->on('productos');
         });

@@ -15,7 +15,6 @@ class CreatePlansTable extends Migration
     {
         Schema::create('plans', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->timestamps();
             $table->string('periodo_id', 4);
             $table->integer('unidad_gestion_id');
             $table->enum('tipo_plan', ['anual', 'trimestral'])->nullable(false);
@@ -25,6 +24,7 @@ class CreatePlansTable extends Migration
             $table->boolean('aprobado');
             $table->boolean('activo');
             $table->boolean('cerrado');
+            $table->timestamps();
 
             $table->foreign('periodo_id')->references('id')->on('periodos')->onDelete('cascade');
             $table->foreign('unidad_gestion_id')->references('id')->on('unidad_gestions')->onDelete('cascade');

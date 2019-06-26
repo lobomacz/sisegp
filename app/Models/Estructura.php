@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Estructura extends Model
 {
-    //
     public function dependencias(){
     	return $this->hasMany('App/Models/Estructura');
     }

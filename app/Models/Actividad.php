@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Actividad extends Model
 {
-    //
 
     protected $table = 'actividades';
 
@@ -20,5 +19,13 @@ class Actividad extends Model
 
     public function planProductos(){
     	return $this->belongsToMany('App/Models/PlanProducto');
+    }
+
+    public function documentos(){
+        return $this->belongsToMany('App/Models/Documento');
+    }
+
+    public function fotos(){
+        return $this->belongsToMany('App/Models/Foto');
     }
 }
