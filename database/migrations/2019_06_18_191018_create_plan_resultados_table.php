@@ -15,8 +15,8 @@ class CreatePlanResultadosTable extends Migration
     {
         Schema::create('plan_resultados', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('plan_id');
-            $table->bigInteger('resultado_id');
+            $table->unsignedBigInteger('plan_id');
+            $table->unsignedBigInteger('resultado_id');
             $table->string('balance_resultado',500)->nullable(false);
             $table->timestamps();
 

@@ -15,8 +15,8 @@ class CreateDocumentoPlanTable extends Migration
     {
         Schema::create('documento_plan', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('documento_id');
-            $table->bigInteger('plan_id');
+            $table->unsignedBigInteger('documento_id');
+            $table->unsignedBigInteger('plan_id');
             $table->timestamps();
 
             $table->foreign('documento_id')->references('id')->on('documentos')->onDelete('cascade');

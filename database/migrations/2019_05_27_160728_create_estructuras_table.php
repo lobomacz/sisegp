@@ -15,8 +15,8 @@ class CreateEstructurasTable extends Migration
     {
         Schema::create('estructuras', function (Blueprint $table) {
             $table->increments('id');
-            $table->char('codigo', 3)
-            $table->integer('estructura_id');
+            $table->char('codigo', 3);
+            $table->unsignedInteger('estructura_id');
             $table->string('nombre', 150)->nullable(false);
             $table->boolean('programa');
             $table->boolean('subprograma');

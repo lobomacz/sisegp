@@ -22,12 +22,14 @@ class CreateFuncionariosTable extends Migration
             $table->string('segundo_apellido', 25);
             $table->enum('sexo', ['masculino', 'femenino']);
             $table->date('fecha_nacimiento');
-            $table->integer('unidad_gestion_id');
+            $table->unsignedInteger('unidad_gestion_id')->nullable(false);
             $table->string('cargo', 25);
             $table->string('correo', 25)->nullable(false);
+            $table->boolean('activo')->default(true);
+            $table->boolean('habilitado')->default(true);
             $table->timestamps();
 
-            $table->foreign('unidad_gestion_id')->references('id')->on('unidad_gestion');
+            $table->foreign('unidad_gestion_id')->references('id')->on('unidad_gestions');
             $table->unique('correo');
             $table->unique('cedula');
         });

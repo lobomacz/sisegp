@@ -15,11 +15,11 @@ class CreateEspecificacionesSolicitudsTable extends Migration
     {
         Schema::create('especificaciones_solicituds', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('solicitud_id');
+            $table->unsignedBigInteger('solicitud_id')->nullable(false);
             $table->integer('item')->nullable(false);
             $table->string('codigo', 5)->nullable(false);
             $table->string('descripcion', 100)->nullable(false);
-            $table->integer('unidad_medida_id');
+            $table->unsignedInteger('unidad_medida_id')->nullable(false);
             $table->float('cantidad', 8, 2)->nullable(false);
             $table->timestamps();
 

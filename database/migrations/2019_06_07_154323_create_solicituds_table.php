@@ -16,13 +16,13 @@ class CreateSolicitudsTable extends Migration
         Schema::create('solicituds', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->enum('tipo_solicitud', ['gastos','proceso por concurso', 'proceso de ejecución de obra', 'compra menor para bienes', 'compra menor para servicios'])->nullable(false);
-            $table->integer('unidad_gestion_id');
-            $table->bigInteger('actividad_insumo_id');
+            $table->unsignedInteger('unidad_gestion_id');
+            $table->unsignedBigInteger('actividad_insumo_id');
             $table->string('justificacion', 400);
             $table->date('fecha');
             $table->decimal('monto',9,2);
             $table->enum('fuente', ['TESORO','COOPERACIÓN','FONDOS PROPIOS','TRAMITE AMBIENTAL']);
-            $table->integer('funcionario_id');
+            $table->unsignedInteger('funcionario_id');
             $table->string('observaciones', 400);
             $table->float('existencia', 8, 2);
             $table->date('fecha_almacen');
@@ -35,10 +35,6 @@ class CreateSolicitudsTable extends Migration
             $table->dateTime('fecha_hora_autorizado');
             $table->dateTime('fecha_hora_aceptado');
             $table->timestamps();
-
-            $table->foreign('actividad_insumo_id')->references('id')->on('actividad_insumo');
-            $table->foreign('funcionario_id')->references('id')->on('funcionarios');
-            $table->foreign('unidad_gestion_id')->references('id')->on('unidad_gestions');
         });
     }
 

@@ -15,7 +15,7 @@ class CreateComunidadsTable extends Migration
     {
         Schema::create('comunidads', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('municipio_id');
+            $table->unsignedInteger('municipio_id');
             $table->string('nombre', 100);
             $table->double('lat', 16, 6)->nullable(false);
             $table->double('lng', 16, 6)->nullable(false);

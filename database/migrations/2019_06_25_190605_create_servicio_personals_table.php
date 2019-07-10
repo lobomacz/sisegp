@@ -15,7 +15,7 @@ class CreateServicioPersonalsTable extends Migration
     {
         Schema::create('servicio_personals', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('plan_id');
+            $table->unsignedBigInteger('plan_id');
             $table->string('clasificador_id');
             $table->string('cargo')->nullable(false);
             $table->integer('cantidad_personas')->default(1);

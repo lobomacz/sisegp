@@ -15,11 +15,11 @@ class CreatePermisosTable extends Migration
     {
         Schema::create('permisos', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('rol_id');
+            $table->unsignedInteger('rol_id');
             $table->boolean('administrar_tablas');
             $table->boolean('administrar_usuarios');
             $table->boolean('eliminar_registros');
-            $table->boolean('corregir_errores');
+            $table->boolean('modificar_registros');
             $table->boolean('digitar_planes');
             $table->boolean('modificar_planes');
             $table->boolean('aprobar_planes');

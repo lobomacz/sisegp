@@ -15,18 +15,15 @@ class CreatePlanProductoTable extends Migration
     {
         Schema::create('plan_producto', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('plan_id');
-            $table->bitInteger('producto_id');
-            $table->integer('meta')->nullable(false);
-            $table->integer('logros')->default(0);
+            $table->unsignedBigInteger('plan_id');
+            $table->unsignedBigInteger('producto_id');
+            $table->decimal('meta', 7, 2)->nullable(false);
+            $table->decimal('logros', 7, 2)->default(0.00);
             $table->string('situacion_inicial', 500);
             $table->string('situacion_resultado', 500);
             $table->string('dificultades', 500);
             $table->string('soluciones', 500);
             $table->timestamps();
-
-            $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
-            $table->foreign('producto_id')->references('id')->on('productos');
         });
     }
 

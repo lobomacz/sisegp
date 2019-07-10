@@ -15,8 +15,8 @@ class CreateActividadFotoTable extends Migration
     {
         Schema::create('actividad_foto', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('actividad_id');
-            $table->bigInteger('foto_id');
+            $table->unsignedBigInteger('actividad_id');
+            $table->unsignedBigInteger('foto_id');
             $table->timestamps();
 
             $table->foreign('actividad_id')->references('id')->on('actividades')->onDelete('cascade');
@@ -31,6 +31,6 @@ class CreateActividadFotoTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('actividad_fotos);
+        Schema::dropIfExists('actividad_fotos');
     }
 }

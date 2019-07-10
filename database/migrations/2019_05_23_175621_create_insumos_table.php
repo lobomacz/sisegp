@@ -17,11 +17,8 @@ class CreateInsumosTable extends Migration
             $table->bigIncrements('id');
             $table->string('clasificador_id', 5);
             $table->string('nombre', 45);
-            $table->integer('unidad_medida_id');
+            $table->unsignedInteger('unidad_medida_id');
             $table->timestamps();
-
-            $table->foreign('clasificador_id')->references('id')->on('clasificadors');
-            $table->foreign('unidad_medida_id')->references('id')->on('unidad_medidas');
         });
     }
 

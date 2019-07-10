@@ -15,7 +15,7 @@ class CreateActividadesTable extends Migration
     {
         Schema::create('actividades', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('producto_id');
+            $table->unsignedBigInteger('producto_id');
             $table->string('codigo', 9);
             $table->string('descripcion', 600);
             $table->enum('fuente_financiamiento', ['tesoro','cooperacion','ingresos propios','privado']);
@@ -27,8 +27,6 @@ class CreateActividadesTable extends Migration
             $table->boolean('cancelada');
             $table->boolean('informe');
             $table->timestamps();
-
-            $table->foreign('producto_id')->references('id')->on('productos');
         });
     }
 

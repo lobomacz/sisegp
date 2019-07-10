@@ -15,12 +15,9 @@ class CreateFuncionarioRolTable extends Migration
     {
         Schema::create('funcionario_rol', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('funcionario_id');
-            $table->integer('rol_id');
+            $table->unsignedInteger('funcionario_id')->nullable(false);
+            $table->unsignedInteger('rol_id')->nullable(false);
             $table->timestamps();
-
-            $table->foreign('funcionario_id')->references('id')->on('funcionarios')->onDelete('cascade');
-            $table->foreign('ron_id')->references('id')->on('rols');
         });
     }
 

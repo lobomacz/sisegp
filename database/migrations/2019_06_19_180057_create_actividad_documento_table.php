@@ -15,8 +15,8 @@ class CreateActividadDocumentoTable extends Migration
     {
         Schema::create('actividad_documento', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('actividad_id');
-            $table->bigInteger('documento_id');
+            $table->unsignedBigInteger('actividad_id');
+            $table->unsignedBigInteger('documento_id');
             $table->timestamps();
 
             $table->foreign('actividad_id')->references('id')->on('actividades')->onDelete('cascade');

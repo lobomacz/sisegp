@@ -15,8 +15,8 @@ class CreateComunidadProyectoTable extends Migration
     {
         Schema::create('comunidad_proyecto', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('comunidad_id');
-            $table->bigInteger('proyecto_id');
+            $table->unsignedBigInteger('comunidad_id');
+            $table->unsignedBigInteger('proyecto_id');
             $table->integer('beneficiarios');
             $table->integer('familias');
             $table->integer('ninos');
