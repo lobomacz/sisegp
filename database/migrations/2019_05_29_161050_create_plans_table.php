@@ -21,9 +21,9 @@ class CreatePlansTable extends Migration
             $table->date('fecha_inicio');
             $table->date('fecha_final');
             $table->integer('trimestre');
-            $table->boolean('aprobado');
-            $table->boolean('activo');
-            $table->boolean('cerrado');
+            $table->boolean('aprobado')->default(false);
+            $table->boolean('activo')->default(true);
+            $table->boolean('cerrado')->default(false);
             $table->timestamps();
         });
     }

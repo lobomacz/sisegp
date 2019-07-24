@@ -83,11 +83,15 @@ class AddForeignKeys extends Migration
             $table->foreign('rol_id')->references('id')->on('rols');
         });
 
-        /*
+        Schema::table('users', function(Blueprint $table){
 
-        Schema::table('', function(Blueprint $table){
+            //Agregado para tener referencia de funcionario por usuario
+
+            $table->foreign('funcionario_id')->references('id')->on('funcionarios')->onDelete('cascade');
             
         });
+
+        /*
 
         Schema::table('', function(Blueprint $tabble){
             

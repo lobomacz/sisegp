@@ -30,6 +30,7 @@ class CreateSolicitudsTable extends Migration
             $table->boolean('revisado_presupuesto');
             $table->boolean('autorizado');
             $table->boolean('aceptado');
+            $table->boolean('anulado');
             $table->dateTime('fecha_hora_revisado');
             $table->dateTime('fecha_hora_presupuesto');
             $table->dateTime('fecha_hora_autorizado');

@@ -17,12 +17,12 @@ class CreateFuncionariosTable extends Migration
             $table->increments('id');
             $table->string('cedula', 16)->nullable(false);
             $table->string('primer_nombre',25)->nullable(false);
-            $table->string('segundo_nombre', 25);
+            $table->string('segundo_nombre', 25)->nullable(true);
             $table->string('primer_apellido', 25)->nullable(false);
-            $table->string('segundo_apellido', 25);
-            $table->enum('sexo', ['masculino', 'femenino']);
-            $table->date('fecha_nacimiento');
-            $table->unsignedInteger('unidad_gestion_id')->nullable(false);
+            $table->string('segundo_apellido', 25)->nullable(true);
+            $table->enum('sexo', ['masculino', 'femenino'])->nullable();
+            $table->date('fecha_nacimiento')->nullable();
+            $table->unsignedInteger('unidad_gestion_id')->nullable();
             $table->string('cargo', 25);
             $table->string('correo', 25)->nullable(false);
             $table->boolean('activo')->default(true);

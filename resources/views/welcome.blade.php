@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Laravel</title>
+        <title>Sistema de Seguimiento de Planificación || SISEGP</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
@@ -61,6 +61,26 @@
             .m-b-md {
                 margin-bottom: 30px;
             }
+
+            .logo {
+                width: 100%;
+                text-align: center;
+                margin-bottom: -15px;
+            }
+
+            .logo__text {
+                text-transform: uppercase;
+                font-size: 84px;
+                font-weight: 100;
+                margin-bottom: -5px;
+            }
+
+            .logo__picture {
+                display: inline-block;
+                width: 30%;
+                margin-bottom: 5px;
+            }
+
         </style>
     </head>
     <body>
@@ -81,9 +101,21 @@
 
             <div class="content">
                 <div class="title m-b-md">
-                    Laravel
+                    <div class="logo">
+                        <h2 class="logo__text">
+                            GRACCS
+                        </h2>
+                        <img class="logo__picture" src="{{ URL::asset('img/logo_azul.png') }}" alt="logo_graccs">
+                    </div>
+                    SISEGP
                 </div>
 
+                <div class="links">
+                    <a href="http://si.graccs.gob.ni" target="_blank">SIGC</a>
+                    <a href="http://si.graccs.gob.ni:8000" target="_blank">Agenda</a>
+                    <a href="http://craccs.gob.ni" target="_blank">Concejo Regional raccs</a>
+                </div>
+<!--
                 <div class="links">
                     <a href="https://laravel.com/docs">Docs</a>
                     <a href="https://laracasts.com">Laracasts</a>
@@ -92,7 +124,7 @@
                     <a href="https://nova.laravel.com">Nova</a>
                     <a href="https://forge.laravel.com">Forge</a>
                     <a href="https://github.com/laravel/laravel">GitHub</a>
-                </div>
+                </div> -->
             </div>
         </div>
     </body>
