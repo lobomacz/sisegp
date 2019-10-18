@@ -18,6 +18,8 @@ class CreateProgramasTable extends Migration
             $table->string('codigo_programa', 25)->nullable(false);
             $table->string('descripcion', 200)->nullable(false);
             $table->string('objetivo_general', 1000)->nullable(false);
+            $table->boolean('finalizado')->default(false);
+            $table->date('fecha_finalizado')->nullable();
             $table->timestamps();
             
             $table->unique('codigo_programa');

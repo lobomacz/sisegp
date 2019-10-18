@@ -20,12 +20,12 @@ class CreateActividadesTable extends Migration
             $table->string('descripcion', 600);
             $table->enum('fuente_financiamiento', ['tesoro','cooperacion','ingresos propios','privado']);
             $table->decimal('monto_presupuesto', 11, 2);
-            $table->decimal('monto_aprobado', 11, 2);
-            $table->decimal('monto_disponible', 11, 2);
-            $table->boolean('aprobada');
-            $table->boolean('ejecutada');
-            $table->boolean('cancelada');
-            $table->boolean('informe');
+            $table->decimal('monto_aprobado', 11, 2)->default(0.00);
+            $table->decimal('monto_disponible', 11, 2)->default(0.00);
+            $table->boolean('aprobada')->default(false);
+            $table->boolean('ejecutada')->default(false);
+            $table->boolean('cancelada')->default(false);
+            $table->boolean('informe')->default(false);
             $table->timestamps();
         });
     }

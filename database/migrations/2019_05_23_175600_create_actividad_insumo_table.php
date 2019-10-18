@@ -20,8 +20,8 @@ class CreateActividadInsumoTable extends Migration
             $table->unsignedInteger('unidad_medida_id');
             $table->decimal('costo_unitario', 11, 2);
             $table->decimal('cantidad', 9, 2);
-            $table->boolean('solicitado');
-            $table->boolean('utilizado');
+            $table->boolean('solicitado')->default(false);
+            $table->boolean('utilizado')->default(false);
             $table->timestamps();
         });
     }

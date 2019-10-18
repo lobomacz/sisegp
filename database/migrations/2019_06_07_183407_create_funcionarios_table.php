@@ -26,7 +26,7 @@ class CreateFuncionariosTable extends Migration
             $table->string('cargo', 25);
             $table->string('correo', 25)->nullable(false);
             $table->boolean('activo')->default(true);
-            $table->boolean('habilitado')->default(true);
+            //$table->boolean('habilitado')->default(true);
             $table->timestamps();
 
             $table->foreign('unidad_gestion_id')->references('id')->on('unidad_gestions');

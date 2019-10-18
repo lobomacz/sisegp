@@ -75,6 +75,11 @@
         <main class="py-4">
             @yield('content')
         </main>
+        <footer class="pt-4 footer">
+            Copyright&copy; Gobierno Regional Costa Caribe Sur
+            Secretaría Regional de Planificación
+            2019
+        </footer>
     </div>
 </body>
 </html>

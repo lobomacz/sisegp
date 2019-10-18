@@ -67,8 +67,8 @@ class AddForeignKeys extends Migration
             $table->foreign('producto_id')->references('id')->on('productos');
         });
 
-        Schema::table('actividad_plan_producto', function(Blueprint $table){
-            $table->foreign('plan_producto_id')->references('id')->on('plan_producto')->onDelete('cascade');
+        Schema::table('actividad_plan', function(Blueprint $table){
+            $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
             $table->foreign('actividad_id')->references('id')->on('actividades');
         });
 

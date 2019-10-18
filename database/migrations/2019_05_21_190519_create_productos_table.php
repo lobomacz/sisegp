@@ -20,6 +20,7 @@ class CreateProductosTable extends Migration
             $table->string('descripcion', 400);
             $table->string('formula', 200);
             $table->unsignedInteger('unidad_medida_id');
+            $table->boolean('aprobado')->default(false);
             $table->timestamps();
         });
     }

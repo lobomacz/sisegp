@@ -17,8 +17,8 @@ class Actividad extends Model
     	return $this->hasMany('App/Models/ActividadInsumo');
     }
 
-    public function planProductos(){
-    	return $this->belongsToMany('App/Models/PlanProducto');
+    public function planes(){
+    	return $this->belongsToMany('App/Models/Plan');
     }
 
     public function documentos(){
@@ -27,5 +27,9 @@ class Actividad extends Model
 
     public function fotos(){
         return $this->belongsToMany('App/Models/Foto');
+    }
+
+    public function informe(){
+        return $this->hasOne('App/Models/InformeActividad');
     }
 }

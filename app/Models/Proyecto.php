@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Proyecto extends Model
 {
+
     public function programa(){
     	return $this->belongsTo('App/Models/Programa');
     }
@@ -20,5 +21,9 @@ class Proyecto extends Model
 
     public function comunidades(){
     	return $this->belongsToMany('App/Models/Comunidad');
+    }
+
+    public function resultados(){
+        return $this->hasMany('App/Models/Resultado');
     }
 }

@@ -17,6 +17,8 @@ class CreateProyectoUnidadGestionTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('proyecto_id');
             $table->unsignedInteger('unidad_gestion_id');
+            $table->boolean('finalizado')->default(false);
+            $table->date('fecha_finalizado')->nullable();
             $table->timestamps();
         });
     }

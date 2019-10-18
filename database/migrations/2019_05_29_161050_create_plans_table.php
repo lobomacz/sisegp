@@ -20,7 +20,7 @@ class CreatePlansTable extends Migration
             $table->enum('tipo_plan', ['anual', 'trimestral'])->nullable(false);
             $table->date('fecha_inicio');
             $table->date('fecha_final');
-            $table->integer('trimestre');
+            $table->integer('trimestre')->nullable(true);
             $table->boolean('aprobado')->default(false);
             $table->boolean('activo')->default(true);
             $table->boolean('cerrado')->default(false);

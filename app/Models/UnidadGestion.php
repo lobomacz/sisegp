@@ -20,12 +20,20 @@ class UnidadGestion extends Model
         return $this->dependencias()->with('allDependencias');
     }
 
+    public function funcionarios(){
+        return $this->hasMany('App/Models/Funcionario');
+    }
+
     public function programas(){
     	return $this->belongsToMany('App/Models/Programa');
     }
 
     public function proyectos(){
     	return $this->belongsToMany('App/Models/Proyecto');
+    }
+
+    public function asignada(){
+        return !($this->programas() == null && $this->proyectos() == null);
     }
 
     public function planes(){

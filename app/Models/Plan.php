@@ -30,6 +30,10 @@ class Plan extends Model
     	return $this->belongsToMany('App/Models/Producto');
     }
 
+    public function actividades(){
+        return $this->belongsToMany('App/Models/Actividad');
+    }
+
     public function serviciosPersonales(){
         return $this->hasMany('App/Models/ServicioPersonal');
     }

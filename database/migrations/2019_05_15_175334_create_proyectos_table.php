@@ -22,8 +22,8 @@ class CreateProyectosTable extends Migration
             $table->date('fecha_final')->nullable();
             $table->unsignedInteger('sector_desarrollo_id');
             $table->decimal('monto_presupuesto', 20, 2);
-            $table->boolean('en_ejecucion');
-            $table->boolean('ejecutado');
+            $table->boolean('en_ejecucion')->default(true);
+            $table->boolean('ejecutado')->default(false);
             $table->timestamps();
 
             $table->unique('codigo_proyecto');
