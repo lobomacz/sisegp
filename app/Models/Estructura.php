@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Estructura extends Model
 {
     public function dependencias(){
-    	return $this->hasMany('App/Models/Estructura');
+    	return $this->hasMany('App\Models\Estructura');
     }
 
     public function allDependencias(){
@@ -15,6 +15,6 @@ class Estructura extends Model
     }
 
     public function unidadGestion(){
-    	return $this->hasOne('App/Models/UnidadGestion');
+    	return $this->hasOne('App\Models\UnidadGestion');
     }
 }

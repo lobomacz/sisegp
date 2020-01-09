@@ -19,10 +19,10 @@ class CreatePlanProductoTable extends Migration
             $table->unsignedBigInteger('producto_id');
             $table->decimal('meta', 7, 2)->nullable(false);
             $table->decimal('logros', 7, 2)->default(0.00);
-            $table->string('situacion_inicial', 500);
-            $table->string('situacion_resultado', 500);
-            $table->string('dificultades', 500);
-            $table->string('soluciones', 500);
+            $table->string('situacion_inicial', 500)->nullable();
+            $table->string('situacion_resultado', 500)->nullable();
+            $table->string('dificultades', 500)->nullable();
+            $table->string('soluciones', 500)->nullable();
             $table->timestamps();
         });
     }

@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Rol extends Model
 {
     public function funcionarios(){
-    	return $this->belongsToMany('App/Models/Funcionario');
+    	return $this->belongsToMany('App\Models\Funcionario');
     }
 
     public function permiso(){
-    	return $this->hasOne('App/Models/Permiso');
+    	return $this->hasOne('App\Models\Permiso');
     }
 }

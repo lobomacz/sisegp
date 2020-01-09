@@ -76,6 +76,7 @@ class RolesTableSeeder extends Seeder
         	'rol_id' => 3,
         	'cerrar_planes' => true,
         	'aprobar_planes' => true,
+            'eliminar_planes' => true,
         	'aprobar_actividades' => true,
         	'cancelar_actividades' => true,
         	'revisar_solicitudes' => true,
@@ -97,7 +98,7 @@ class RolesTableSeeder extends Seeder
         //Permisos de digitador
         DB::table('permisos')->insert([
         	'rol_id' => 5,
-        	'digitar_planes' => true,
+        	'ingresar_planes' => true,
         	'modificar_planes' => true,
         	'ingresar_productos' => true,
         	'modificar_productos' => true,
@@ -116,7 +117,7 @@ class RolesTableSeeder extends Seeder
         //Permisos de digitador-adq
         DB::table('permisos')->insert([
         	'rol_id' => 6,
-        	'digitar_planes' => true,
+        	'ingresar_planes' => true,
         	'modificar_planes' => true,
         	'ingresar_productos' => true,
         	'modificar_productos' => true,
@@ -136,7 +137,7 @@ class RolesTableSeeder extends Seeder
         //Permisos de digitador-presupuesto
         DB::table('permisos')->insert([
         	'rol_id' => 7,
-        	'digitar_planes' => true,
+        	'ingresar_planes' => true,
         	'modificar_planes' => true,
         	'ingresar_productos' => true,
         	'modificar_productos' => true,
@@ -156,7 +157,7 @@ class RolesTableSeeder extends Seeder
         //Permisos de digitador-fin
         DB::table('permisos')->insert([
         	'rol_id' => 7,
-        	'digitar_planes' => true,
+        	'ingresar_planes' => true,
         	'modificar_planes' => true,
         	'ingresar_productos' => true,
         	'modificar_productos' => true,

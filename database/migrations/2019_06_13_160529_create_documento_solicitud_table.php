@@ -18,9 +18,6 @@ class CreateDocumentoSolicitudTable extends Migration
             $table->unsignedBigInteger('documento_id');
             $table->unsignedBigInteger('solicitud_id');
             $table->timestamps();
-
-            $table->foreign('documento_id')->references('id')->on('documentos')->onDelete('cascade');
-            $table->foreign('solicitud_id')->references('id')->on('solicituds')->onDelete('cascade');
         });
     }
 

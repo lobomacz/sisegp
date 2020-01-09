@@ -9,7 +9,7 @@ class Clasificador extends Model
     protected $keyType = 'string';
 
     public function children(){
-    	return $this->hasMany('App/Models/Clasificador');
+    	return $this->hasMany('App\Models\Clasificador');
     }
 
     public function allChildren(){
@@ -17,6 +17,6 @@ class Clasificador extends Model
     }
 
     public function insumos(){
-    	return $this->hasMany('App/Models/Insumo');
+    	return $this->hasMany('App\Models\Insumo');
     }
 }

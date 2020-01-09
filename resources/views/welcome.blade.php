@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Sistema de Seguimiento de Planificación || SISEGP</title>
+        <title>{{ __('messages.sysname') }} || SISEGP</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
@@ -87,13 +87,23 @@
         <div class="flex-center position-ref full-height">
             @if (Route::has('login'))
                 <div class="top-right links">
-                    @auth
-                        <a href="{{ url('/home') }}">Home</a>
+    
+                    <!-- Language Links -->
+
+                    @if (App::isLocale('en'))
+                    <a href="{{ route('Lang', ['lang' => 'es', 'backroute' => 'Welcome']) }}" class="dropdown-item">Español</a>
                     @else
-                        <a href="{{ route('login') }}">Login</a>
+                    <a href="{{ route('Lang', ['lang' => 'en', 'backroute' => 'Welcome']) }}" class="dropdown-item">English</a>
+                    @endif
+
+    
+                    @auth
+                        <a href="{{ url('/home') }}">{{ __('Home') }}</a>
+                    @else
+                        <a href="{{ route('login') }}">{{ __('Login') }}</a>
 
                         @if (Route::has('register'))
-                            <a href="{{ route('register') }}">Register</a>
+                            <a href="{{ route('register') }}">{{ __('Register') }}</a>
                         @endif
                     @endauth
                 </div>
@@ -113,7 +123,7 @@
                 <div class="links">
                     <a href="http://si.graccs.gob.ni" target="_blank">SIGC</a>
                     <a href="http://si.graccs.gob.ni:8000" target="_blank">Agenda</a>
-                    <a href="http://craccs.gob.ni" target="_blank">Concejo Regional raccs</a>
+                    <a href="http://craccs.gob.ni" target="_blank">{{ __('messages.craccs_link') }}</a>
                 </div>
 <!--
                 <div class="links">

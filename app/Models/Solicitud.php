@@ -8,22 +8,22 @@ class Solicitud extends Model
 {
 
     public function solicitante(){
-    	return $this->belongsTo('App/Models/Funcionario');
+    	return $this->belongsTo('App\Models\Funcionario');
     }
 
     public function unidadGestion(){
-        return $this->belongsTo('App/Models/UnidadGestion');
+        return $this->belongsTo('App\Models\UnidadGestion');
     }
 
     public function actividadInsumo(){
-    	return $this->belongsTo('App/Models/ActividadInsumo');
+    	return $this->belongsTo('App\Models\ActividadInsumo');
     }
 
     public function especificaciones(){
-    	return $this->hasMany('App/Models/EspecificacionesSolicitud');
+    	return $this->hasMany('App\Models\EspecificacionesSolicitud');
     }
 
     public function documentos(){
-    	return $this->belongsToMany('App/Models/Documentos');
+    	return $this->belongsToMany('App\Models\Documentos');
     }
 }

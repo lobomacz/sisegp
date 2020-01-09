@@ -17,10 +17,10 @@ class CreatePlansTable extends Migration
             $table->bigIncrements('id');
             $table->string('periodo_id', 4);
             $table->unsignedInteger('unidad_gestion_id');
-            $table->enum('tipo_plan', ['anual', 'trimestral'])->nullable(false);
+            $table->enum('tipo_plan', ['anual', 'trimestral']);
             $table->date('fecha_inicio');
             $table->date('fecha_final');
-            $table->integer('trimestre')->nullable(true);
+            $table->integer('trimestre')->nullable();
             $table->boolean('aprobado')->default(false);
             $table->boolean('activo')->default(true);
             $table->boolean('cerrado')->default(false);

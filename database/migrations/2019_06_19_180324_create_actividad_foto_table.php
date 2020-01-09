@@ -18,9 +18,6 @@ class CreateActividadFotoTable extends Migration
             $table->unsignedBigInteger('actividad_id');
             $table->unsignedBigInteger('foto_id');
             $table->timestamps();
-
-            $table->foreign('actividad_id')->references('id')->on('actividades')->onDelete('cascade');
-            $table->foreign('foto_id')->references('id')->on('fotos')->onDelete('cascade');
         });
     }
 

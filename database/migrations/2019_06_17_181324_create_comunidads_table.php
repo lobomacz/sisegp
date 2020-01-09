@@ -17,11 +17,10 @@ class CreateComunidadsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedInteger('municipio_id');
             $table->string('nombre', 100);
-            $table->double('lat', 16, 6)->nullable(false);
-            $table->double('lng', 16, 6)->nullable(false);
+            $table->double('lat', 16, 6);
+            $table->double('lng', 16, 6);
+            $table->point('punto')->nullable();
             $table->timestamps();
-
-            $table->foreign('municipio_id')->references('id')->on('municipios')->onDelete('cascade');
         });
     }
 

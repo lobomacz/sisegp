@@ -20,6 +20,7 @@ class CreateMunicipiosTable extends Migration
             $table->string('nombre_corto', 10);
             $table->float('poblacion_aprox', 8, 2);
             $table->float('extension_km_2', 8, 2);
+            $table->polygon('mapa')->nullable();
             $table->timestamps();
         });
     }

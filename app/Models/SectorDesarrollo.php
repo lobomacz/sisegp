@@ -7,6 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class SectorDesarrollo extends Model
 {
     public function proyectos(){
-    	return $this->hasMany('App/Models/Proyecto');
+    	return $this->hasMany('App\Models\Proyecto');
     }
 }

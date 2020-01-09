@@ -38,6 +38,6 @@ class User extends Authenticatable
     ];
 
     public function funcionario(){
-        return $this->belongsTo('App/Models/Funcionario');
+        return $this->belongsTo('App\Models\Funcionario');
     }
 }

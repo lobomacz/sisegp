@@ -18,9 +18,6 @@ class CreateActividadDocumentoTable extends Migration
             $table->unsignedBigInteger('actividad_id');
             $table->unsignedBigInteger('documento_id');
             $table->timestamps();
-
-            $table->foreign('actividad_id')->references('id')->on('actividades')->onDelete('cascade');
-            $table->foreign('documento_id')->references('id')->on('documentos')->onDelete('cascade');
         });
     }
 

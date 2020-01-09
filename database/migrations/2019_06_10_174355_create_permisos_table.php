@@ -24,6 +24,7 @@ class CreatePermisosTable extends Migration
             $table->boolean('modificar_planes')->default(false);
             $table->boolean('aprobar_planes')->default(false);
             $table->boolean('cerrar_planes')->default(false);
+            $table->boolean('eliminar_planes')->default(false);
             $table->boolean('ingresar_programas')->default(false);
             $table->boolean('modificar_programas')->default(false);
             $table->boolean('ingresar_proyectos')->default(false);
@@ -53,8 +54,6 @@ class CreatePermisosTable extends Migration
             $table->boolean('recepcionar_solicitudes')->default(false);
             
             $table->timestamps();
-
-            $table->foreign('rol_id')->references('id')->on('rols')->onDelete('cascade');
         });
     }
 

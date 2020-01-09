@@ -16,9 +16,9 @@ class CreateUnidadGestionsTable extends Migration
         Schema::create('unidad_gestions', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('estructura_id');
-            $table->string('nombre', 100)->nullable(false);
+            $table->string('nombre', 100);
             $table->boolean('direccion_coordinacion');
-            $table->unsignedInteger('unidad_gestion_id');
+            $table->unsignedInteger('unidad_gestion_id')->nullable();
             $table->timestamps();
         });
     }

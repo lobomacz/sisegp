@@ -10,6 +10,7 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="{{ asset('js/app.js') }}" defer></script>
 
     <!-- Fonts -->
@@ -32,13 +33,49 @@
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav mr-auto">
 
+                    <ul class="navbar-nav mr-auto">
+                        @yield('toolbar')
                     </ul>
 
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ml-auto">
+
+                        <!-- Language Links -->
+
+                        <li class="nav-item dropdown text-uppercase">
+                            
+                            <a id="langDropdown" href="#" class="nav-link d-inline-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" arie-expanded="false">
+                                @if(App::isLocale('es'))
+                                <div class="bandera mx-3">
+                                    <div class="bandera__img bandera__img--es"></div>
+                                </div>
+                                @else
+                                <div class="bandera mx-3">
+                                    <div class="bandera__img bandera__img--en"></div>
+                                </div>
+                                @endif
+                                {{ App::getLocale() }}
+                            </a>
+
+                            <div class="dropdown-menu dropdown-menu-right w-auto" aria-labelledby="langDropdown">
+                                <a href="{{ route('Lang', ['lang' => 'es', 'backroute' => isset($backroute)?$backroute:'Home']) }}" class="dropdown-item text-uppercase">
+                                    ESPAÑOL
+                                    <div class="bandera float-right">
+                                        <div class="bandera__img bandera__img--es"></div>
+                                    </div>
+                                </a>
+                                <a href="{{ route('Lang', ['lang' => 'en', 'backroute' => isset($backroute)?$backroute:'Home']) }}" class="dropdown-item">
+                                    ENGLISH
+                                    <div class="bandera float-right">
+                                        <div class="bandera__img bandera__img--en"></div>
+                                    </div>
+                                </a>
+                            </div>
+                        </li>
+
                         <!-- Authentication Links -->
+                        
                         @guest
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
@@ -76,9 +113,23 @@
             @yield('content')
         </main>
         <footer class="pt-4 footer">
-            Copyright&copy; Gobierno Regional Costa Caribe Sur
-            Secretaría Regional de Planificación
-            2019
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-8 text-center">
+                        Copyright&copy; {{ __('messages.copyright') }}
+                    </div>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-md-8 text-center">
+                        {{ __('messages.owner') }}
+                    </div>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-md-8 text-center">
+                        {{ date('Y') }}
+                    </div>
+                </div>
+            </div>
         </footer>
     </div>
 </body>

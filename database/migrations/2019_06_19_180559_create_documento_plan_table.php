@@ -18,9 +18,6 @@ class CreateDocumentoPlanTable extends Migration
             $table->unsignedBigInteger('documento_id');
             $table->unsignedBigInteger('plan_id');
             $table->timestamps();
-
-            $table->foreign('documento_id')->references('id')->on('documentos')->onDelete('cascade');
-            $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
         });
     }
 

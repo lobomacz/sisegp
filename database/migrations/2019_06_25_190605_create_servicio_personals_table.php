@@ -19,19 +19,16 @@ class CreateServicioPersonalsTable extends Migration
             $table->string('clasificador_id');
             $table->string('cargo')->nullable(false);
             $table->integer('cantidad_personas')->default(1);
-            $table->decimal('salario', 8, 2)->nullable(false);
-            $table->decimal('treceavo', 8, 2)->nullable(false);
-            $table->decimal('antiguedad', 8, 2)->nullable(false);
-            $table->decimal('patronal', 8, 2)->nullable(false);
-            $table->decimal('inatec', 8, 2)->nullable(false);
+            $table->decimal('salario', 8, 2);
+            $table->decimal('treceavo', 8, 2);
+            $table->decimal('antiguedad', 8, 2);
+            $table->decimal('patronal', 8, 2);
+            $table->decimal('inatec', 8, 2)->default(0.00);
             $table->decimal('beneficios', 8, 2)->default(0.00);
             $table->decimal('vacaciones', 8, 2)->default(0.00);
             $table->decimal('otros_beneficios', 8, 2)->default(0.00);
             $table->decimal('horas_extra', 8, 2)->default(0.00);
             $table->timestamps();
-
-            $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
-            $table->foreign('clasificador_id')->references('id')->on('clasificadors');
         });
     }
 

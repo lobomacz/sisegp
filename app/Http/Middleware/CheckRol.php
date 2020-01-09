@@ -16,7 +16,7 @@ class CheckRol
      */
     public function handle($request, Closure $next, $rol)
     {
-        if(! $request->user()->funcionario()->tieneRol($rol)){
+        if(! $request->user()->funcionario->tieneRol($rol)){
             return redirect()->route('error', ['title' => 'Acceso Denegado', 'message' => 'No posee permisos de acceso suficientes para la acción solicitada.']);
         }
 

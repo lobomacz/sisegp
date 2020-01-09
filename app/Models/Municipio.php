@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Municipio extends Model
 {
     public function comunidades(){
-    	return $this->hasMany('App/Models/Comunidad');
+    	return $this->hasMany('App\Models\Comunidad');
     }
 
     public function comunidadesProyectos(){

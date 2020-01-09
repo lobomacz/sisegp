@@ -8,22 +8,22 @@ class Proyecto extends Model
 {
 
     public function programa(){
-    	return $this->belongsTo('App/Models/Programa');
+    	return $this->belongsTo('App\Models\Programa');
     }
 
     public function unidadesGestion(){
-    	return $this->belongsToMany('App/Models/UnidadGestion');
+    	return $this->belongsToMany('App\Models\UnidadGestion');
     }
 
     public function sectorDesarrollo(){
-    	return $this->belongsTo('App/Models/SectorDesarrollo');
+    	return $this->belongsTo('App\Models\SectorDesarrollo');
     }
 
     public function comunidades(){
-    	return $this->belongsToMany('App/Models/Comunidad');
+    	return $this->belongsToMany('App\Models\Comunidad');
     }
 
     public function resultados(){
-        return $this->hasMany('App/Models/Resultado');
+        return $this->hasMany('App\Models\Resultado');
     }
 }

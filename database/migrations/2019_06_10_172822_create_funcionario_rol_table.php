@@ -15,8 +15,8 @@ class CreateFuncionarioRolTable extends Migration
     {
         Schema::create('funcionario_rol', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedInteger('funcionario_id')->nullable(false);
-            $table->unsignedInteger('rol_id')->nullable(false);
+            $table->unsignedInteger('funcionario_id');
+            $table->unsignedInteger('rol_id');
             $table->timestamps();
         });
     }

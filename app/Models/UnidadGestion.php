@@ -9,11 +9,11 @@ class UnidadGestion extends Model
     //
     
     public function estructura(){
-    	return $this->belongsTo('App/Models/Estructura');
+    	return $this->belongsTo('App\Models\Estructura');
     }
 
     public function dependencias(){
-    	return $this->hasMany('App/Models/UnidadGestion');
+    	return $this->hasMany('App\Models\UnidadGestion');
     }
 
     public function allDependencias(){
@@ -21,15 +21,15 @@ class UnidadGestion extends Model
     }
 
     public function funcionarios(){
-        return $this->hasMany('App/Models/Funcionario');
+        return $this->hasMany('App\Models\Funcionario');
     }
 
     public function programas(){
-    	return $this->belongsToMany('App/Models/Programa');
+    	return $this->belongsToMany('App\Models\Programa');
     }
 
     public function proyectos(){
-    	return $this->belongsToMany('App/Models/Proyecto');
+    	return $this->belongsToMany('App\Models\Proyecto');
     }
 
     public function asignada(){
@@ -37,10 +37,10 @@ class UnidadGestion extends Model
     }
 
     public function planes(){
-        return $this->hasMany('App/Models/Plan');
+        return $this->hasMany('App\Models\Plan');
     }
 
     public function solicitudes(){
-        return $this->hasMany('App/Models/Solicitud');
+        return $this->hasMany('App\Models\Solicitud');
     }
 }

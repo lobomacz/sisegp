@@ -17,7 +17,7 @@ class CreateProyectosTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedInteger('programa_id');
             $table->string('codigo_proyecto', 25);
-            $table->string('descripcion', 400)->charset('utf8');
+            $table->string('descripcion', 1000)->charset('utf8');
             $table->date('fecha_inicio')->nullable();
             $table->date('fecha_final')->nullable();
             $table->unsignedInteger('sector_desarrollo_id');

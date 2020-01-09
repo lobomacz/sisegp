@@ -9,8 +9,6 @@ use Illuminate\Http\Request;
 class UsuarioController extends Controller
 {
     //
-    protected $funcionario = Auth::user()->funcionario;
-    protected $secccion = "Usuarios";
 	/**
 	* Ingresa un nuevo Usuario
 	*
@@ -21,16 +19,19 @@ class UsuarioController extends Controller
 
     	if($request->isMethod('get')){
 
-    		$funcionario = $this->funcionario;
+    		$funcionario = Auth::user()->funcionario;
+
+            $secccion = "Usuarios";
+
     		$usuario = new User;
 
     		$funcionarios = App\Models\Funcionario::all()->filter(function($funcionario){
 
-    			return $funcionario->usuario == null;
+    			return $funcionario->usuario === null;
 
     		});
 
-    		return view('usuarios.formulario', ['titulo' => 'Ingreso de Usuarios', 'seccion':$this->seccion, 'funcionarios' => $funcionarios], 'usuario' => $usuario, 'funcionario' => $funcionario);
+    		return view('usuarios.formulario', ['titulo' => 'Ingreso de Usuarios', 'seccion':$seccion, 'funcionarios' => $funcionarios], 'usuario' => $usuario, 'funcionario' => $funcionario);
 
     	}elseif ($request->isMethod('post')) {
 
@@ -45,11 +46,14 @@ class UsuarioController extends Controller
             }
 
     		$usuario = new User;
+
             $funcionario_user = Funcionario::findOrFail($request->funcionario_id);
 
     		//$usuario->funcionario_id = $request->funcionario_id;
     		$usuario->name = $request->name;
+
     		$usuario->email = $request->email;
+
     		$usuario->password = $request->password;
 
     		//$usuario->save();
@@ -63,8 +67,11 @@ class UsuarioController extends Controller
 
     	if($id != null || $id == ''){
 
-    		$funcionario = $this->funcionario;
-    		return view('usuarios.perfil', ['usuario' => User::findOrFail($id), 'funcionario' => $funcionario]);
+    		$funcionario = Auth::user()->funcionario;
+
+            $secccion = "Usuarios";
+
+    		return view('usuarios.perfil', ['usuario' => User::findOrFail($id), 'funcionario' => $funcionario, 'seccion' => $seccion]);
 
     	}else{
 
@@ -81,15 +88,21 @@ class UsuarioController extends Controller
     public function editar(Request $request, $id){
 
     	if($request->isMethod('get')){
-    		$funcionario = $this->funcionario;
-    		return view('usuarios.formulario', ['usuario' => User::findOrFail($id), 'funcionario' => $funcionario],'titulo' => 'Modificación de Usuarios', 'seccion':$this->seccion);
+
+    		$funcionario = Auth::user()->funcionario;
+
+            $secccion = "Usuarios";
+
+    		return view('usuarios.formulario', ['usuario' => User::findOrFail($id), 'funcionario' => $funcionario],'titulo' => 'Modificación de Usuarios', 'seccion':$seccion);
 
     	}else if($request->isMethod('post')){
 
     		$usuario = User::find($id);
 
     		$usuario->name = $request->name;
+
     		$usuario->email = $request->email;
+
     		$usuario->save();
 
     		return redirect()->route('DetalleUsuario', ['id' => $id]);
@@ -97,9 +110,11 @@ class UsuarioController extends Controller
     }
 
     public function eliminar(Request $request, $id){
+
     	if($request->isMethod('get')){
 
-    		$funcionario = $this->funcionario;
+    		$funcionario = Auth::user()->funcionario;
+
             $ruta = route('EliminarUsuario', ['id' => $id]);
 
     		return view('alert', ['funcionario' => $funcionario, 'route' => $ruta, 'titulo' => 'Eliminar Usuario', 'mensaje' => 'Se eliminará el registro de la base de datos.']);
@@ -107,6 +122,7 @@ class UsuarioController extends Controller
         }else if($request->isMethod('post')){
     		
             $usuario = User::findOrFail($id);
+
     		$usuario->delete();
 
     		return redirect()->route('AdminUsuarios');
@@ -124,7 +140,9 @@ class UsuarioController extends Controller
     	}else if($request->isMethod('post')){
 
     		$usuario = User::findOrFail($id);
+
     		$usuario->activo = false;
+            
     		$usuario->save();
 
     		return redirect()->route('AdminUsuarios');

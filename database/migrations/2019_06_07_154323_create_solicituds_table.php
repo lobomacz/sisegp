@@ -22,7 +22,7 @@ class CreateSolicitudsTable extends Migration
             $table->date('fecha');
             $table->decimal('monto',9,2);
             $table->enum('fuente', ['TESORO','COOPERACIÓN','FONDOS PROPIOS','TRAMITE AMBIENTAL']);
-            $table->unsignedInteger('funcionario_id');
+            $table->unsignedInteger('funcionario_id')->nullable();
             $table->string('observaciones', 400);
             $table->float('existencia', 8, 2);
             $table->date('fecha_almacen');

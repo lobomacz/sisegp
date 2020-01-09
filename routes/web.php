@@ -13,11 +13,13 @@
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('Welcome')->middleware('language');
 
 Auth::routes(['register' => false]);
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/lang/{lang}/{backroute}', 'LangController@lang')->name('Lang');
+
+Route::get('/home', 'HomeController@index')->name('Home');
 
 //RUTAS ADMINISTRATIVAS
 
@@ -115,6 +117,15 @@ Route::match(['get', 'post'], '/proyectos/{id}/unidad-gestion/remover', 'Admin\P
 
 Route::match(['get', 'post'], '/proyectos/{id}/eliminar', 'Admin\ProyectoController@eliminar')->where('id', '[0-9]+')->name('EliminarProyecto')->middleware('auth', 'check.rol:superusuario');
 
+//RUTAS DE MENÚS PRINCIPALES
+
+Route::get('/digitacion', 'HomeController@digitacion')->name('Digitacion');
+
+Route::get('/gestion', 'HomeController@gestion')->name('Gestion');
+
+Route::get('/reportes', 'HomeController@reportes')->name('Reportes');
+
+
 //RUTAS DE ADMINISTRACION DE INDICADORES DE RESULTADO DE PROYECTOS
 
 Route::get('/resultados', 'MPMP\ResultadoController@index')->name('IndiceResultados')->middleware('auth');
@@ -171,7 +182,7 @@ Route::match(['get', 'post'], '/producto/{id}/actividades/{id_act}/insumos/edita
 
 Route::match('/producto/{id}/actividades/{id_act}/informe', 'MPMP\ActividadController@informe')->where(['id' => '[0-9]+', 'id_act' => '[0-9]+'])->name('InformeActividad')->middleware('auth');
 
-Route::match('/producto/{id}/actividades/{id_act}/informe/{tipo}', 'MPMP\ActividadController@documento_informe')->where(['id' => '[0-9]+', 'id_act' => '[0-9]+'], 'tipo' => '[A-Za-z]{3}')->name('DocumentoInformeActividad')->middleware('auth');
+Route::match('/producto/{id}/actividades/{id_act}/informe/{tipo}', 'MPMP\ActividadController@documento_informe')->where(['id' => '[0-9]+', 'id_act' => '[0-9]+', 'tipo' => '[A-Za-z]{3}'])->name('DocumentoInformeActividad')->middleware('auth');
 
 // Rutas para administración de PLANES 
 
@@ -201,9 +212,13 @@ Route::match(['get', 'post'], '/planes/{id}/productos', 'MPMP\PlanController@pro
 
 Route::match(['get', 'post'], '/planes/{id}/actividades', 'MPMP\PlanController@PlanActividades')->where('id', '[0-9]+')->name('PlanActividades')->middleware('auth', 'check.permissions:modificar_planes');
 
-Route::match(['get', 'post'], '/planes/{id}/servicios-personales', 'MPMP\PlanController@planServiciosPersonales')->where('id', '[0-9]+')->name('PlanServiciosPersonales');
+Route::match(['get', 'post'], '/planes/{id}/servicios-personales', 'MPMP\PlanController@servicios_personales')->where('id', '[0-9]+')->name('PlanServiciosPersonales')->middleware('auth', 'check.permissions:modificar_planes');
 
-Route::get('/solicitudes', 'Control\SolicitudController@index')->name('IndiceSolicitudes');
+Route::match(['get', 'post'], '/planes/{id}/informe', 'MPMP\PlanController@informe')->where('id', '[0-9]+')->name('InformePlan')->middleware('auth', 'check.permissions:modificar_planes');
+
+Route::get('/solicitudes', 'Control\SolicitudController@index')->name('IndiceSolicitudes')->middleware('auth', 'check.permissions:revisar_solicitudes');
+
+Route::get('/solicitudes/planes/{id}', 'Control\SolicitudController@index_plan')->where('id', '[0-9]+')->name('SolicitudesPlan')->middleware('auth', 'check.permissions:ingresar_solicitudes');
 
 Route::get('/solicitudes/{tipo}', 'Control\SolicitudController@solicitudesPorTipo')->where('tipo', '[A-Za-z]+')->name('SolicitudesPorTipo');
 

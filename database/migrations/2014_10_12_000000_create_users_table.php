@@ -15,7 +15,7 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedInteger('funcionario_id')->nullable(false);
+            $table->unsignedInteger('funcionario_id');
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
@@ -24,7 +24,7 @@ class CreateUsersTable extends Migration
             $table->rememberToken();
             $table->timestamps();
 
-            $table->foreign('funcionario_id')->references('id')->on('funcionarios')->onDelete('cascade');
+            //$table->foreign('funcionario_id')->references('id')->on('funcionarios')->onDelete('cascade');
         });
     }
 

@@ -1,0 +1,21 @@
+.bandera {
+
+	display: inline-block;
+	width: 1.5rem;
+	position: relative;
+
+	&__img {
+		width: 100%;
+		height: 1rem;
+		background-size: cover;
+
+		&--es {
+			background-image: url(../storage/imgs/flag-ES.png);
+		}
+
+		&--en {
+			background-image: url(../storage/imgs/flag-EN.png);
+		}
+	}
+
+}

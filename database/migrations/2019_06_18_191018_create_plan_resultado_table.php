@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePlanResultadosTable extends Migration
+class CreatePlanResultadoTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,13 @@ class CreatePlanResultadosTable extends Migration
      */
     public function up()
     {
-        Schema::create('plan_resultados', function (Blueprint $table) {
+        Schema::create('plan_resultado', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('plan_id');
             $table->unsignedBigInteger('resultado_id');
-            $table->string('balance_resultado',500)->nullable(false);
+            //Se ingresa balance_resultado a la hora de hacer informe del plan trimestral.
+            $table->string('balance_resultado',500)->nullable(); 
             $table->timestamps();
-
-            $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
-            $table->foreign('resultado_id')->references('id')->on('resultados')->onDelete('cascade');
         });
     }
 
@@ -32,6 +30,6 @@ class CreatePlanResultadosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('plan_resultados');
+        Schema::dropIfExists('plan_resultado');
     }
 }

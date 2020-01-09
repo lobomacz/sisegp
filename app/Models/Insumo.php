@@ -7,14 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class Insumo extends Model
 {
     public function actividades(){
-    	return $this->belognsToMany('App/Models/Actividad');
+    	return $this->belognsToMany('App\Models\Actividad');
     }
 
     public function clasificador(){
-    	return $this->belongsTo('App/Models/Clasificador');
+    	return $this->belongsTo('App\Models\Clasificador');
     }
 
     public function unidadBase(){
-    	return $this->belongsTo('App/Models/UnidadMedida');
+    	return $this->belongsTo('App\Models\UnidadMedida');
     }
 }
