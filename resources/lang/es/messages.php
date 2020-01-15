@@ -11,6 +11,7 @@
 		"regional_council" => "Concejo Regional Costa Caribe Sur",
 		"craccs_link" => "Concejo Regional RACCS",
 		"manage_dashboard" => "Bienvenido al panel de gestión. Seleccione uan opción del menú de la izquierda.",
+		"digitacion_header" => "Bienvenido a la sección de digitación. Seleccione una opción del menú de la izquierda",
 	]
 
  ?>

@@ -29,7 +29,9 @@ class HomeController extends Controller
 
     public function digitacion(){
 
-        return view('landingpage.digitacion', ['backroute' => 'Digitacion']);
+        $funcionario = Auth::user()->funcionario;
+
+        return view('landingpage.digitacion', ['backroute' => 'Digitacion', 'funcionario' => $funcionario]);
     }
 
     public function gestion(){
@@ -40,7 +42,10 @@ class HomeController extends Controller
     }
 
     public function reportes(){
-        return view('landingpage.reportes', ['backroute' => 'Reportes']);
+
+        $funcionario = Auth::user()->funcionario;
+
+        return view('landingpage.reportes', ['backroute' => 'Reportes', 'funcionario' => $funcionario]);
     }
 
 }

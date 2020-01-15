@@ -10,6 +10,7 @@
 		"regional_council" => "South Caribbean Coast Regional Council",
 		"craccs_link" => "RACCS Regional Council",
 		"manage_dashboard" => "Welcome to the management dashboard. Select an option from the menu on the left.",
+		"digitacion_header" => "Welcome to the data input section. Select an option from the menu on the left",
 	]
  ?>
 

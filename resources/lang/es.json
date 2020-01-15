@@ -61,5 +61,7 @@
 	"budget":"presupuesto",
 	"receive":"recibir",
 	"spanish":"español",
-	"english":"inglés"
+	"english":"inglés",
+	"manage":"gestionar",
+	"data input":"ingreso de datos"
 }

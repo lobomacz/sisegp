@@ -153,68 +153,10 @@
 				
 				@if($funcionario->tieneRol('director-seplan') || $funcionario->tieneRol('digitador') || $funcionario->tieneRol('digitador-adq') || $funcionario->tieneRol('digitador-presupuesto') || $funcionario->tieneRol('digitador-fin'))
 				<div class="card">
-					<div class="card-header" id="mnuIngresar">
-						<h2 class="mb-0">
-							<button class="btn btn-link text-uppercase" type="button" data-toggle="collapse" data-target="#navIngresar" aria-expanded="false" aria-controls="mnuIngresar">
-								{{ __('enter') }}
-							</button>
-						</h2>
-					</div>
-
-					<div id="navIngresar" aria-labelledBy="mnuIngresar" class="collapse" data-parent="#mnuMenuPrincipal">
-						<div class="card-body">
-							<ul class="nav flex-column">
-								@if($funcionario->tienePermiso('ingresar_programas'))
-								<li class="nav-item text-uppercase">
-									<a href="{{ route('NuevoPrograma') }}" class="nav-link">
-										{{ __('programs') }}
-									</a>
-								</li>
-								@endif
-								@if($funcionario->tienePermiso('ingresar_proyectos'))
-								<li class="nav-item text-uppercase">
-									<a href="{{ route('NuevoProyecto') }}" class="nav-link">
-										{{ __('projects') }}
-									</a>
-								</li>
-								@endif
-								<li class="nav-item text-uppercase">
-									<a href="{{ route('NuevoResultado') }}" class="nav-link">
-										{{ __('result indicators') }}
-									</a>
-								</li>
-								<li class="nav-item text-uppercase">
-									<a href="" class="nav-link">
-										{{ __('product indicators') }}
-									</a>
-								</li>
-								<li class="nav-item text-uppercase">
-									<a href="" class="nav-link">
-										{{ __('activities') }}
-									</a>
-								</li>
-								<li class="nav-item text-uppercase">
-									<a href="" class="nav-link">
-										{{ __('plans') }}
-									</a>
-								</li>
-								<li class="nav-item text-uppercase">
-									<a href="" class="nav-link">
-										{{ __('supplies requests') }}
-									</a>
-								</li>
-							</ul>
-						</div>
-					</div>
-				</div>
-				@endif
-				
-				@if($funcionario->tieneRol('director-seplan') || $funcionario->tieneRol('digitador') || $funcionario->tieneRol('digitador-adq') || $funcionario->tieneRol('digitador-presupuesto') || $funcionario->tieneRol('digitador-fin'))
-				<div class="card">
 					<div class="card-header" id="mnuModificar">
 						<h2 class="mb-0">
 							<button class="btn btn-link text-uppercase" type="button" data-toggle="collapse" data-target="#navModificar" aria-expanded="false" aria-controls="mnuModificar">
-								{{ __('modify') }}
+								{{ __('manage') }}
 							</button>
 						</h2>
 					</div>
