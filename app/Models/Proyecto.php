@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Proyecto extends Model
 {
+    use SoftDeletes;
+
+    protected $guarded = ['fecha_final', 'ejecutado'];
 
     public function programa(){
     	return $this->belongsTo('App\Models\Programa');

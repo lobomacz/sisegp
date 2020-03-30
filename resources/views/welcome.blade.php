@@ -81,7 +81,16 @@
                 margin-bottom: 5px;
             }
 
+            .form__lang {
+                position: absolute;
+                visibility: hidden;
+                top: -100rem;
+                left: -100rem;
+            }
+
+
         </style>
+        <link rel="stylesheet" href="{{ URL::asset('storage/css/styles.css') }}">
     </head>
     <body>
         <div class="flex-center position-ref full-height">
@@ -91,16 +100,24 @@
                     <!-- Language Links -->
 
                     @if (App::isLocale('en'))
-                    <a href="{{ route('Lang', ['lang' => 'es', 'backroute' => 'Welcome']) }}" class="dropdown-item">Español</a>
+                    <a href="#" class="dropdown-item" onclick="event.preventDefault();document.getElementById('form-es').submit();">Español</a>
+                    <form id="form-es" class="form__lang" action="{{ route('Lang', ['lang' => 'es']) }}" method="post">
+                        @csrf
+                        <input name="backroute" id="backroute" type="hidden" value="{{ route('Welcome') }}">
+                    </form>
                     @else
-                    <a href="{{ route('Lang', ['lang' => 'en', 'backroute' => 'Welcome']) }}" class="dropdown-item">English</a>
+                    <a href="#" class="dropdown-item" onclick="event.preventDefault();document.getElementById('form-en').submit();">English</a>
+                    <form id="form-en" action="{{ route('Lang', ['lang' => 'en']) }}" class="form__lang" method="post">
+                        @csrf
+                        <input id="backroute" type="hidden" name="backroute" value="{{ route('Welcome') }}">
+                    </form>
                     @endif
 
     
                     @auth
                         <a href="{{ url('/home') }}">{{ __('Home') }}</a>
                     @else
-                        <a href="{{ route('login') }}">{{ __('Login') }}</a>
+                        <a href="{{ route('login') }}">{{ __('Login') }}&nbsp;<span class="icon icon-macz-sign-in"></span></a>
 
                         @if (Route::has('register'))
                             <a href="{{ route('register') }}">{{ __('Register') }}</a>

@@ -1,19 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Control;
+namespace App\Http\Controllers\MPMP;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Libreria\MenuBuilder;
 use App\Models\UnidadGestion;
 use App\Models\UnidadMedida;
 use App\Models\Resultado;
 use App\Models\Proyecto;
+use Auth;
 
 class ResultadoController extends Controller
 {
-    protected $funcionario = Auth::user()->funcionario;
-    
-    protected $seccion = 'Indicadores de Resultado';
 
     /**
     * Indice de resultados
@@ -25,160 +24,323 @@ class ResultadoController extends Controller
     * y en la segunda lista, Proyecto. Cada formulario dirigirá a un controlador según corresponda
     * con el dato seleccionado de la lista desplegable.
     */
+    const SECCION = 'result indicators';
 
-    public function index(){
+    public function lista(MenuBuilder $mb, $page, $todos=null){
 
-    	$proyectos = null;
-    	$unidades = null;
+        $proyectos = null;
+        $funcionario = Auth::user()->funcionario;
+        $limite = config('variables.limite_lista', 20);
+        $ruta = route('ListaResultados', ['page' => $page, 'todos' => $todos]);
 
-    	if ($this->funcionario->tieneRol('superusuario') || $this->funcionario->tieneRol('director') || $this->funcionario->tieneRol('director-seplan') || $this->funcionario->tieneRol('director-ejecutivo')) {
+        if ($funcionario->tieneRol('superusuario') || $funcionario->tieneRol('director-seplan') || $funcionario->tieneRol('director-ejecutivo')){
 
-    		$unidades = UnidadGestion::all();
-    		$proyectos = Proyecto::all()->filter(function($proyecto){
-    			return !$proyecto->ejecutado;
-    		});
-
-    		if ($proyectos == null && $unidades == null) {
-    			return view('alert', ['titulo' => 'Existe inconsistencia de datos', 'seccion' => $this->seccion, 'mensaje' => 'Debe seleccionar un proyecto o una unidad de gestión', 'funcionario' => $this->funcionario]);
-    		}
-
-    		return view('mpmp.resultados_unidad' ['titulo' => 'Lista General de Resultados', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'unidades' => $unidades, 'proyectos' => $proyectos]);
-
-    		
-    	}else{
-
-    		$proyectos = $this->funcionario->unidadGestion->proyectos;
-
-    		return view('mpmp.resultados_unidad' ['titulo' => 'Resultados por Unidad de Gestión', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'proyectos' => $proyectos]);
-    	}
-    }
-
-    public function resultadosProyecto(Request $request){
-
-    	if ($request->has('proyecto_id')) {
-
-    		$proyecto = Proyecto::findOrFail($request->proyecto_id);
-    		$resultados = $proyecto->resultados;
-
-    		return view('mpmp.resultados_proyecto', ['titulo' => 'Indicadores de Resultado para el proyecto', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'resultados' => $resultados, 'ver' => true, 'proyecto' => $proyecto]);
+            $unidades = UnidadGestion::all();
             
-    	}else{
-    		return view('alert', ['titulo' => 'Existe inconsistencia de datos', 'seccion' => $this->seccion, 'mensaje' => 'Debe seleccionar un proyecto para el indicador. Revise y vuelva a intentarlo.', 'funcionario' => $this->funcionario]);
-    	}
+            $proyectos = Proyecto::all()->filter(function($proyecto){
+
+              return !$proyecto->ejecutado;
+
+            })->paginate($limite);
+
+            if (isset($todos) && $todos == 't') {
+                
+                $proyectos = Proyecto::all()->paginate($limite);
+            }
+
+
+            return view('mpmp.lista_resultados', ['seccion' => self::SECCION, 'unidades' => $unidades, 'proyectos' => $proyectos, 'todos' => $todos, 'backroute' => $ruta, 'menu_list' => $mb->getMenu()]);
+
+        } else {
+
+            if (isset($todos) && $todos == 't') {
+                
+                $proyectos = $funcionario->unidadGestion->proyectos;
+            }else {
+                $proyectos = $funcionario->unidadGestion->proyectos->filter(function($proyecto){
+                    return !$proyecto->ejecutado;
+                });
+            }   
+
+            return view('mpmp.Lista_resultados_unidad', ['seccion' => self::SECCION, 'proyectos' => $proyectos, 'todos' => $todos, 'backroute' => $ruta, 'menu_list' => $mb->getMenu()]);
+
+        }
     }
 
-    public function resultadosUnidad(Request $request){
-    	
-    	if ($request->has('unidad_gestion_id')) {
 
-    		$unidad_gestion = UnidadGestion::findOrFail($request->unidad_gestion_id);
-    		$proyectos = $unidad_gestion->proyectos->where('ejecutado', false)->get();
+    public function lista_filtro(MenuBuilder $mb, $filtro, $valor, $page, $todos=null){
 
-    		return view('mpmp.resultados_unidad', ['titulo' => 'Indicadores de Resultado', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'unidad_gestion' => $unidad_gestion, 'ver' => true, 'proyectos' => $proyectos]);
-    	}else{
-    		return view('alert', ['titulo' => 'Existe inconsistencia de datos', 'seccion' => $this->seccion, 'mensaje' => 'Debe seleccionar una unidad de gestion para listar los resultados. Revise y vuelva a intentarlo.', 'funcionario' => $this->funcionario]);
-    	}
+        $funcionario = Auth::user()->funcionario;
+        $limite = config('variables.limite_lista', 20);
+        $ruta = route('ListaResultadosFiltro', ['page' => $page, 'filtro' => $filtro, 'todos' => $todos]);
+
+        if ($funcionario->tieneRol('superusuario') || $funcionario->tieneRol('director-seplan') || $funcionario->tieneRol('director-ejecutivo')){
+
+            if ($filtro === 'proyecto') {
+                
+                /*
+                $proyecto = Proyecto::findOrFail($valor);
+
+                $resultados = $proyecto->resultados->paginate($limite);
+
+                $datos = ['seccion' => self::SECCION, 'backroute' => $ruta, 'proyecto' => $proyecto, 'resultados' => $resultados, 'menu_list' => $mb->getMenu()];
+
+                return view('mpmp.lista_resultados_proyecto', $datos);
+                */
+                //$datos = ['seccion' => self::SECCION, 'backroute' => $ruta, 'proyecto' => $proyecto, 'resultados' => $resultados, 'menu_list' => $mb->getMenu()];
+
+                $this->filtro_proyecto($valor, $ruta);
+
+            } elseif ($filtro === 'unidad-gestion') {
+                
+                $unidad = UnidadGestion::findOrFail($valor);
+
+                $proyectos = $unidad->proyectos->where('ejecutado', false)->get();
+
+                if (isset($todos) && $todos == 't') {
+                    
+                    $proyectos = $unidad->proyectos;
+                }
+
+                $datos = ['seccion' => self::SECCION, 'backroute' => $ruta, 'unidad' => $unidad, 'proyectos' => $proyectos, 'menu_list' => $mb->getMenu()];
+
+                return view('Lista_resultados_unidad', $datos);
+
+            }
+
+        } elseif ($funcionario->tieneRol('digitador') || $funcionario->tieneRol('digitador-adq')) {
+
+            /*
+            $proyecto = Proyecto::findOrFail($valor);
+
+            $resultados = $proyecto->resultados->paginate($limite);
+
+            $datos = ['seccion' => self::SECCION, 'backroute' => $ruta, 'proyecto' => $proyecto, 'resultados' => $resultados, 'menu_list' => $mb->getMenu()];
+
+            return view('mpmp.lista_resultados_proyecto', $datos);
+            */
+            //$datos = ['seccion' => self::SECCION, 'backroute' => $ruta, 'proyecto' => $proyecto, 'resultados' => $resultados, 'menu_list' => $mb->getMenu()];
+
+            $this->filtro_proyecto($valor, $ruta);
+            
+        } else {
+
+            toastr()->error(__('messages.unauthorized_operation'), 'Error');
+
+            return redirect()->route('ListaResultados', ['page' => 1]);
+
+        }
+
     }
 
-    public function nuevo(Request $request){
-    	if ($request->isMethod('get')) {
+    private function filtro_proyecto(MenuBuilder $mb, $valor, $ruta){
 
-    		$unidad_gestion = $this->funcionario->unidadGestion;
-    		$unidades_medida = UnidadMedida::all();
-    		$proyectos = $unidad_gestion->proyectos;
-    		$resultado = new Resultado;
+        $proyecto = Proyecto::findOrFail($valor);
 
-    		return view('mpmp.formulario_resultado', ['titulo' => 'Ingreso de Indicadores de Resultado', 'seccion' => $this->seccion, 'unidad_gestion' => $unidad_gestion, 'proyectos' => $proyectos, 'resultado' => $resultado, 'route' => 'NuevoResultado', 'unidades' => $unidades_medida, 'funcionario' => $this->funcionario]);
+        $resultados = $proyecto->resultados;
 
-    	}else if($request->isMethod('post')){
+        $datos = ['seccion' => self::SECCION, 'backroute' => $ruta, 'proyecto' => $proyecto, 'resultados' => $resultados, 'menu_list' => $mb->getMenu()];
 
-    		if (!$request->has('proyecto_id')) {
-    			return redirect()->route('error');
-    		}else {
+        return view('mpmp.lista_resultados_proyecto', $datos);
 
-    			$resultado = new Resultado;
-    			$proyecto = Proyecto::findOrFail($request->proyecto_id);
-
-    			$resultado->codigo = $request->codigo;
-    			$resultado->descripcion = $request->descripcion;
-    			$resultado->formula = $request->formula;
-    			$resultado->unidad_medida_id = $request->unidad_medida_id;
-    			$proyecto->resultados()->save($resultado);
-
-    			return redirect()->route('IndiceResultados');
-    		}
-    	}
     }
 
-    public function ver($id){
+    public function nuevo(Request $request, MenuBuilder $mb){
 
-    	if (is_null($id)) {
+        if($request->isMethod('get')){
 
-    		return redirect()->route('error');
+            $funcionario = Auth::user()->funcionario;
 
-    	}else{
+            $unidad_gestion = $funcionario->unidadGestion;
+            $unidades_medida = UnidadMedida::all();
+            $proyectos = $unidad_gestion->proyectos->where('ejecutado', false)->get();
+            $resultado = new Resultado;
+            $ruta = route('NuevoResultado');
 
-    		$resultado = Resultado::findOrFail($id);
+            if (!$request->session()->has('errors')) {
+                # code...
+                toastr()->info(__('messages.required_fields'));
 
-    		return view('mpmp.detalle_resultado', ['titulo' => 'Detalle de Indicador de Resultado', 'secccion' => $this->seccion, 'funcionario' => $this->funcionario, 'resultado' => $resultado]);
+            } else {
 
-    	}
+                toastr()->error(__('messages.validation_error'), strtoupper(__('Valudation Error')));
+
+            }
+
+            return view('mpmp.nuevo_resultado', ['seccion' => self::SECCION, 'unidad_gestion' => $unidad_gestion, 'proyectos' => $proyectos, 'resultado' => $resultado, 'ruta' => $ruta, 'backroute' => $ruta, 'unidades' => $unidades_medida, 'menu_list' => $mb->getMenu()]);
+
+
+        } elseif ($request->isMethod('post')) {
+            
+            $request->validate([
+                'proyecto_id' => 'bail|integer|required',
+                'codigo' => 'alpha_dash|max:3|min:3|required',
+                'descripcion' => 'alpha_dash|max:400|required',
+                'formula' => 'string|max:200|nullable',
+                'unidad_medida_id' => 'integer|required',
+            ]);
+
+            $resultado = null;
+
+            try {
+
+                $resultado = Resultado::create($request->input());
+                
+            } catch (Exception $e) {
+                
+                error_log('Excepción al crear nuevo resultado. '.$e->getMessage());
+
+                toastr()->error(__('messages.registration_error'), strtoupper(__('Operation Error')));
+
+                return redirect()->route('error');
+            }
+
+            if (isset($resultado)) {
+                
+                return redirect()->route('VerResultado', ['id' => $resultado->id]);
+
+            }
+
+        }
+    }
+
+    public function ver(MenuBuilder $mb, $id){
+
+        $resultado = Resultado::findOrFail($id);
+
+        $ruta = route('VerResultado', ['id' => $id]);
+        $ruta_delete = route('EliminarResultado', ['id' => $id]);
+        $ruta_edit = route('EditarResultado', ['id' => $id]);
+        $ruta_aprobar= route('AprobarResultado', ['id' => $id]);
+
+        return view('mpmp.ver_resultado', ['secccion' => self::SECCION, 'resultado' => $resultado, 'backroute' => $ruta, 'ruta_edit' => $ruta_edit, 'ruta_delete' => $ruta_delete, 'ruta_aprobar' => $ruta_aprobar, 'menu_list' => $mb->getMenu()]);
 
     }
 
     public function aprobar($id){
 
-    	if (is_null($id)) {
+        $resultado = Resultado::findOrFail($id);
 
-    		return redirect()->route('error');
+        try {
 
-    	}else{
+            $resultado->aprobado = true;
 
-    		$resultado = Resultado::findOrFail($id);
-    		$resultado->aprobado = true;
-
-    		$resultado->save();
-
-    		return redirect()->route('IndiceResultados');
-
-    	}
-    }
-
-    public function editar(Request $request, $id){
-
-    	if ($request->isMethod('get')) {
-
-    		$resultado = Resultado::findOrFail($id);
-    		$unidades = UnidadMedida::all();
-    		$proyectos = $this->funcionario->unidadGestion->proyectos;
-
-    		return view('mpmp.formulario_resultado', ['titulo' => 'Edición de Indicadores de Resultado', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'resultado' => $resultado, 'unidades' => $unidades, 'proyectos' => $proyectos, 'route' => 'EditarResultado']);
-
-    	}else if ($request->isMethod('post')) {
-
-    		if (!$request->has(['proyecto_id', 'unidad_medida_id', 'descripcion'])) {
-
-    			return view('alert', ['titulo' => 'Existe inconsistencia de datos', 'seccion' => $this->seccion, 'mensaje' => 'Los datos ingresados no son suficientes. Revise y vuelva a intentarlo.', 'funcionario' => $this->funcionario]);
-
-    		}
-    	}
-    }
-
-    public function eliminar(Request $request, $id){
-
-    	if($request->isMethod('get')){
-
-            $ruta = route('EliminarResultado', ['id' => $id]);
-
-    		return view('alert', ['titulo' => 'Eliminar Indicador de Resultado', 'seccion' => $this->seccion, 'mensaje' => 'Se eliminará el registro de la base de datos', 'funcionario' => $this->funcionario, 'route' => $ruta]);
-
-    	}elseif ($request->isMethod('post')) {
-    		
-    		$resultado = Resultado::findOrFail($id);
-    		$resultado->delete();
+            $resultado->save();
             
-    		return redirect()->route('IndiceResultados');
-    	}
+        } catch (Exception $e) {
+
+            error_log("Excepción al aprobar resultado. ".$e->getMessage());
+
+            toastr()->error(__('messages.critical_error'), strtoupper(__('Operation Error')));
+
+            return redirect()->route('error');
+
+        }
+        
+
+        return redirect()->route('VerResultado', ['id' => $id]);
 
     }
+
+    public function editar(Request $request, MenuBuilder $mb, $id){
+
+        $resultado = Resultado::findOrFail($id);
+
+        if ($request->isMethod('get')) {
+            # code...
+            if ($resultado->aprobado) {
+                
+                toastr()->error(__('messages.edit_approved_record'), strtoupper(__('clearance violation')));
+
+                return redirect()->route('ListaResultados', ['page' => 1]);
+                
+            }
+
+            $unidades = UnidadMedida::all();
+            $proyectos = $funcionario->unidadGestion->proyectos->where('ejecutado', false)->get();
+            $ruta = route('EditarResultado', ['id' => $id]);
+
+            if (!$request->session()->has('errors')) {
+                
+                toastr()->info(__('messages.required_fields'));
+
+            }else{
+
+                toastr()->error(__('messages.validation_error'), strtoupper(__('Validation Error')));
+
+            }
+
+            return view('mpmp.editar_resultado', ['seccion' => self::SECCION, 'resultado' => $resultado, 'unidades' => $unidades, 'proyectos' => $proyectos, 'ruta' => $ruta, 'backroute' => $ruta, 'menu_list' => $mb->getMenu()]);
+
+        } elseif ($request->isMethod('post')) {
+            # code...
+            $request->validate([
+                'proyecto_id' => 'bail|integer|required',
+                'codigo' => 'alpha_dash|max:3|min:3|required',
+                'descripcion' => 'alpha_dash|max:400|required',
+                'formula' => 'string|max:200|nullable',
+                'unidad_medida_id' => 'integer|required',
+            ]);
+
+            try {
+
+                $resultado->fill($request->input());
+
+                $resultado->save();
+                
+            } catch (Exception $e) {
+                
+                error_log("Excepción al actualizar resultado. ".$e->getMessage());
+
+                toastr()->error(__('messages.critical_error'), strtoupper(__('Operation Error')));
+
+                return redirect()->route('error');
+
+            }
+
+            return redirect()->route('VerResultado', ['id' => $resultado->id]);
+
+        }
+    }
+
+    public function eliminar($id){
+
+        $resultado = Resultado::findOrFail($id);
+
+        try {
+
+            $resultado->delete();
+            
+        } catch (Exception $e) {
+
+            error_log("Excepción al eliminar resultado. ".$e->getMessage());
+
+            toastr()->error(__('messages.critical_error'), strtoupper(__('Operation Error')));
+
+            return redirect()->route('error');
+            
+        }
+
+        return redirect()->route('ListaResultados', ['page' => 1]);
+        
+    }
+
+
+    public function ingresar_productos(Request $request, MenuBuilder $mb, $id){
+
+        $resultado = Resultado::findOrFail($id);
+
+        $ruta = route('IngresarProductosResultado', ['id' => $id]);
+
+        if ($request->isMethod('get')) {
+            # code...
+            $extra_rows = config('variables.extra_rows');
+            
+        } else if ($request->isMethod('post')) {
+            # code...
+        }
+    }
+
+
+
 }

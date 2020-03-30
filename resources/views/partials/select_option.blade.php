@@ -1,0 +1,1 @@
+<option class="text-uppercase" value="{{ $item->$value_field }}" {{ isset($value) && $value == $item->$value_field ? 'selected':''}}>{{ $item->$text_field }}</option>

@@ -1,0 +1,1 @@
+<div class="alert alert-danger mensaje-error">{{ $errors->first($field) }}</div>

@@ -178,6 +178,16 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
+        /*
+         * Toastr Service Provider
+         */
+        Yoeunes\Toastr\ToastrServiceProvider::class,
+
+        /*
+         * Proveedor MenuServiceProvider
+         */
+        App\Providers\MenuServiceProvider::class,
+
     ],
 
     /*

@@ -13,6 +13,7 @@ class UsersTableSeeder extends Seeder
     {
         //Alimentador inicial de la tabla Users con el registro del superadministrador
         DB::table('funcionarios')->insert([
+            'rol_id' => 1,
         	'cedula' => '000-000000-00000',
         	'primer_nombre' => 'Administrador',
         	'primer_apellido' => 'Administrador',
@@ -23,6 +24,7 @@ class UsersTableSeeder extends Seeder
         ]);
 
         DB::table('funcionarios')->insert([
+            'rol_id' => 5,
             'cedula' => '601-130579-0000J',
             'primer_nombre' => 'Marvin',
             'primer_apellido' => 'Córdoba',
@@ -30,9 +32,11 @@ class UsersTableSeeder extends Seeder
             'correo' => 'lobomacz@yahoo.com',
             'sexo' => 'masculino',
             'fecha_nacimiento' => '1979-05-13',
+            'unidad_gestion_id' => 3,
         ]);
 
         DB::table('funcionarios')->insert([
+            'rol_id' => 3,
             'cedula' => '601-161275-0001A',
             'primer_nombre' => 'Franklin',
             'primer_apellido' => 'Brooks',
@@ -40,9 +44,11 @@ class UsersTableSeeder extends Seeder
             'correo' => 'fbrooksvargas_2013@yahoo.com',
             'sexo' => 'masculino',
             'fecha_nacimiento' => date('Y-m-d'),
+            'unidad_gestion_id' => 3,
         ]);
 
         DB::table('funcionarios')->insert([
+            'rol_id' => 4,
             'cedula' => '601-080179-0001K',
             'primer_nombre' => 'Danilo',
             'primer_apellido' => 'Chang',
@@ -50,6 +56,19 @@ class UsersTableSeeder extends Seeder
             'correo' => 'danilo.chang@gmail.com',
             'sexo' => 'masculino',
             'fecha_nacimiento' => date('Y-m-d'),
+            'unidad_gestion_id' => 1,
+        ]);
+
+        DB::table('funcionarios')->insert([
+            'rol_id' => 2,
+            'cedula' => '603-180356-1000F',
+            'primer_nombre' => 'Manuel',
+            'primer_apellido' => 'Zapata',
+            'cargo' => 'Director de Finanzas',
+            'correo' => 'mzapata@yahoo.com',
+            'sexo' => 'masculino',
+            'fecha_nacimiento' => date('Y-m-d'),
+            'unidad_gestion_id' => 2,
         ]);
 
         DB::table('users')->insert([
@@ -80,6 +99,14 @@ class UsersTableSeeder extends Seeder
             'password' => bcrypt('madmacz'),
         ]);
 
-        $this->call(RolesTableSeeder::class);
+        DB::table('users')->insert([
+            'funcionario_id' => 5,
+            'name' => 'Manuel Zapata',
+            'email' => 'mzapata@yahoo.com',
+            'password' => bcrypt('madmacz'),
+        ]);
+
+        //$this->call(RolesTableSeeder::class);
+
     }
 }

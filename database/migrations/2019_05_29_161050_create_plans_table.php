@@ -21,9 +21,10 @@ class CreatePlansTable extends Migration
             $table->date('fecha_inicio');
             $table->date('fecha_final');
             $table->integer('trimestre')->nullable();
+            $table->decimal('monto_aprobado', 11, 2)->nullable();
             $table->boolean('aprobado')->default(false);
-            $table->boolean('activo')->default(true);
-            $table->boolean('cerrado')->default(false);
+            $table->boolean('activo')->default(false);  // disponible para elaborar planes trimestrales
+            $table->boolean('cerrado')->default(false); // actividades ejecutadas y con informes
             $table->timestamps();
         });
     }

@@ -1,0 +1,1 @@
+<a href="{{ $ruta }}" class="card-link btn btn-primary text-uppercase{{ isset($trashed) && $trashed == true ? ' disabled':'' }}" data-toggle="toottip" data-placement="top" title="{{ $titulo }}"><span class="icon icon-macz-{{ $icono }}"></span></a>

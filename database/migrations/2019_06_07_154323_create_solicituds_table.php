@@ -15,26 +15,25 @@ class CreateSolicitudsTable extends Migration
     {
         Schema::create('solicituds', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->date('fecha');
             $table->enum('tipo_solicitud', ['gastos','proceso por concurso', 'proceso de ejecución de obra', 'compra menor para bienes', 'compra menor para servicios'])->nullable(false);
             $table->unsignedInteger('unidad_gestion_id');
             $table->unsignedBigInteger('actividad_insumo_id');
-            $table->string('justificacion', 400);
-            $table->date('fecha');
-            $table->decimal('monto',9,2);
-            $table->enum('fuente', ['TESORO','COOPERACIÓN','FONDOS PROPIOS','TRAMITE AMBIENTAL']);
+            $table->string('justificacion', 400); //justificación de cantidad y calidad solicitados
+            $table->decimal('monto', 11, 2);
+            $table->enum('fuente', ['tesoro','cooperación','fondos propios','trámite ambiental']);
             $table->unsignedInteger('funcionario_id')->nullable();
+            $table->string('solicitante', 100);
             $table->string('observaciones', 400);
-            $table->float('existencia', 8, 2);
-            $table->date('fecha_almacen');
-            $table->boolean('revisado_planificacion');
-            $table->boolean('revisado_presupuesto');
-            $table->boolean('autorizado');
-            $table->boolean('aceptado');
-            $table->boolean('anulado');
-            $table->dateTime('fecha_hora_revisado');
-            $table->dateTime('fecha_hora_presupuesto');
-            $table->dateTime('fecha_hora_autorizado');
-            $table->dateTime('fecha_hora_aceptado');
+            $table->float('existencia', 8, 2)->nullable();
+            $table->date('fecha_almacen')->nullable();
+            $table->boolean('revisado')->default(false);
+            $table->boolean('autorizado')->default(false);
+            $table->boolean('procesado')->default(false);
+            $table->boolean('anulado')->default(false);
+            $table->dateTime('fecha_hora_revisado')->nullable();
+            $table->dateTime('fecha_hora_autorizado')->nullable();
+            $table->dateTime('fecha_hora_procesado')->nullable();
             $table->timestamps();
         });
     }

@@ -1,0 +1,11 @@
+@mixin prop-icono {
+	display: inline-block;
+	width: 2rem;
+	position: relative;
+}
+
+@mixin prop-icono-img {
+	width: 100%;
+	height: 1.5rem;
+	background-size: cover;
+}

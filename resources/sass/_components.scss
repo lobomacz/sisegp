@@ -1,13 +1,10 @@
-.bandera {
-
-	display: inline-block;
-	width: 1.5rem;
-	position: relative;
+.bandera{
+	@include prop-icono;
 
 	&__img {
-		width: 100%;
-		height: 1rem;
-		background-size: cover;
+
+		
+		@include prop-icono-img;
 
 		&--es {
 			background-image: url(../storage/imgs/flag-ES.png);
@@ -19,3 +16,14 @@
 	}
 
 }
+
+.menu-anidado {
+	padding: 0 !important;
+	color: #212529 !important;
+}
+
+.card-img--dark {
+	opacity: .4;
+	box-shadow: .5rem .7rem .3rem $dark-grey;
+}
+

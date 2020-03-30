@@ -36,25 +36,14 @@ class RolesTableSeeder extends Seeder
         	'descripcion' => 'digitador-adq',
         ]);
 
-        DB::table('rols')->insert([
-        	'descripcion' => 'digitador-presupuesto',
-        ]);
-
-        DB::table('rols')->insert([
-        	'descripcion' => 'digitador-fin',
-        ]);
 
         //Permisos de superusuario
         DB::table('permisos')->insert([
         	'rol_id' => 1,
-        	'administrar_tablas' => true,
-        	'administrar_usuarios' => true,
-        	'eliminar_registros' => true,
-        	'modificar_registros' => true,
-        	'ingresar_funcionarios' => true,
-        	'modificar_funcionarios' => true,
+            'ver_programas' => true,
         	'ingresar_programas' => true,
         	'modificar_programas' => true,
+            'ver_proyectos' => true,
         	'ingresar_proyectos' => true, 
         	'modificar_proyectos' => true,
         ]);
@@ -63,12 +52,20 @@ class RolesTableSeeder extends Seeder
         DB::table('permisos')->insert([
         	'rol_id' => 2,
         	'aprobar_planes' => true,
+            'gestionar_planes' => true,
             'aprobar_productos' => true,
             'aprobar_resultados' => true,
         	'aprobar_actividades' => true,
         	'cancelar_actividades' => true,
         	'revisar_solicitudes' => true,
         	'anular_solicitudes' => true,
+            'ver_programas' => true,
+            'ver_proyectos' => true,
+            'ver_resultados' => true,
+            'ver_productos' => true,
+            'ver_actividades' => true,
+            'ver_planes' => true,
+            'ver_solicitudes' => true,
         ]);
 
         //Permisos de director-seplan
@@ -77,6 +74,7 @@ class RolesTableSeeder extends Seeder
         	'cerrar_planes' => true,
         	'aprobar_planes' => true,
             'eliminar_planes' => true,
+            'gestionar_planes' => true,
         	'aprobar_actividades' => true,
         	'cancelar_actividades' => true,
         	'revisar_solicitudes' => true,
@@ -86,6 +84,13 @@ class RolesTableSeeder extends Seeder
         	'modificar_proyectos' => true,
             'aprobar_resultados' => true,
             'aprobar_productos' => true,
+            'ver_programas' => true,
+            'ver_proyectos' => true,
+            'ver_resultados' => true,
+            'ver_productos' => true,
+            'ver_actividades' => true,
+            'ver_planes' => true,
+            'ver_solicitudes' => true,
         ]);
 
         //Permisos de director-ejecutivo
@@ -93,6 +98,13 @@ class RolesTableSeeder extends Seeder
         	'rol_id' => 4,
         	'autorizar_solicitudes' => true,
         	'anular_solicitudes' => true,
+            'ver_programas' => true,
+            'ver_proyectos' => true,
+            'ver_resultados' => true,
+            'ver_productos' => true,
+            'ver_actividades' => true,
+            'ver_planes' => true,
+            'ver_solicitudes' => true,
         ]);
 
         //Permisos de digitador
@@ -131,50 +143,12 @@ class RolesTableSeeder extends Seeder
             'eliminar_actividades' => true,
         	'ingresar_solicitudes' => true,
         	'modificar_solicitudes' => true,
-        	'recepcionar_solicitudes' => true,
+        	'procesar_solicitudes' => true,
         ]);
 
-        //Permisos de digitador-presupuesto
-        DB::table('permisos')->insert([
-        	'rol_id' => 7,
-        	'ingresar_planes' => true,
-        	'modificar_planes' => true,
-        	'ingresar_productos' => true,
-        	'modificar_productos' => true,
-            'eliminar_productos' => true,
-            'ingresar_resultados' => true,
-            'modificar_resultados' => true,
-            'eliminar_resultados' => true,
-            'ingresar_actividades' => true,
-            'modificar_actividades' => true,
-            'ejecutar_actividades' => true,
-            'eliminar_actividades' => true,
-        	'ingresar_solicitudes' => true,
-        	'modificar_solicitudes' => true,
-        	'verificar_presupuesto' => true,
-        ]);
 
-        //Permisos de digitador-fin
-        DB::table('permisos')->insert([
-        	'rol_id' => 7,
-        	'ingresar_planes' => true,
-        	'modificar_planes' => true,
-        	'ingresar_productos' => true,
-        	'modificar_productos' => true,
-            'eliminar_productos' => true,
-            'ingresar_resultados' => true,
-            'modificar_resultados' => true,
-            'eliminar_resultados' => true,
-            'ingresar_actividades' => true,
-            'modificar_actividades' => true,
-            'ejecutar_actividades' => true,
-            'eliminar_actividades' => true,
-        	'ingresar_solicitudes' => true,
-        	'modificar_solicitudes' => true,
-        	'recepcionar_solicitudes' => true,
-        ]);
-
-        $this->call(FuncionarioRolTableSeeder::class);
+        //$this->call(FuncionarioRolTableSeeder::class);
+        $this->call(EstructurasTableSeeder::class);
 
     }
 }

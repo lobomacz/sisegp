@@ -26,6 +26,7 @@ class CreateFuncionariosTable extends Migration
             $table->string('cargo', 45);
             $table->string('correo', 45);
             $table->boolean('activo')->default(true);
+            $table->unsignedInteger('rol_id');
             //$table->boolean('habilitado')->default(true);
             $table->timestamps();
         });

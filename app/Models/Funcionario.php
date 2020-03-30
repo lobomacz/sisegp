@@ -14,27 +14,31 @@ class Funcionario extends Model
     	return $this->hasOne('App\User');
     }
 
-    public function roles(){
-    	return $this->belongsToMany('App\Models\Rol');
+    public function rol(){
+    	return $this->belongsTo('App\Models\Rol');
     }
 
     public function tieneRol($rol){
 
-    	$hasRole = $this->roles()->where('descripcion', $rol)->first();
-    	return ($hasRole != null);
+    	//$hasRole = $this->rol()->where('descripcion', $rol)->first();
+
+    	return $this->rol->descripcion === $rol;
         
     }
 
     public function tienePermiso($permiso){
 
-        $permitido = false;
+        $permitido = $this->rol->permiso[$permiso] == true;
 
+
+        /*
         foreach ($this->roles as $rol) {
             if($rol->permiso->$permiso === true){
                 $permitido = true;
                 break;
             }
         }
+        */
 
         return $permitido;
     	

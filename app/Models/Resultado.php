@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Resultado extends Model
 {
+	protected $guarded = ['id', 'aprobado'];
+
+
     public function proyecto(){
     	return $this->belongsTo('App\Models\Proyecto');
     }

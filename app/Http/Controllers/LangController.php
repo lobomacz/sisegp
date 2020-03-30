@@ -7,12 +7,12 @@ use Illuminate\Http\Request;
 class LangController extends Controller
 {
     //
-    public function lang($lang, $backroute){
+    public function lang(Request $request, $lang){
 
         \App::setLocale($lang);
 
         \Session::put('applang', $lang);
 
-        return redirect()->route($backroute);
+        return redirect($request->backroute);
     }
 }

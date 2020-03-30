@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Libreria\MenuBuilder;
 use Auth;
 
 class HomeController extends Controller
@@ -22,30 +23,9 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
+    public function index(MenuBuilder $mbuilder)
     {
-        return view('home', ['backroute' => 'Home']);
-    }
-
-    public function digitacion(){
-
-        $funcionario = Auth::user()->funcionario;
-
-        return view('landingpage.digitacion', ['backroute' => 'Digitacion', 'funcionario' => $funcionario]);
-    }
-
-    public function gestion(){
-
-        $funcionario = Auth::user()->funcionario;
-
-        return view('landingpage.gestion', ['backroute' => 'Gestion', 'funcionario' => $funcionario]);
-    }
-
-    public function reportes(){
-
-        $funcionario = Auth::user()->funcionario;
-
-        return view('landingpage.reportes', ['backroute' => 'Reportes', 'funcionario' => $funcionario]);
+        return view('home', ['menu_list' => $mbuilder->getMenu()]);
     }
 
 }

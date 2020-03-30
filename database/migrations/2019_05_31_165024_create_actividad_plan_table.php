@@ -18,6 +18,8 @@ class CreateActividadPlanTable extends Migration
             $table->unsignedBigInteger('plan_id');
             $table->unsignedBigInteger('actividad_id');
             $table->date('fecha_programada');
+            $table->boolean('ejecutada')->default(false);
+            $table->date('fecha_ejecutada')->nullable();
             $table->timestamps();
         });
     }

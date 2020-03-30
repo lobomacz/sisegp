@@ -16,7 +16,7 @@ class CheckPermissions
      */
     public function handle($request, Closure $next, $permiso)
     {
-        if(! $request->user()->funcionario()->tienePermiso($permiso)){
+        if(! $request->user()->funcionario->tienePermiso($permiso)){
             return redirect()->route('error', ['title' => 'Acceso Denegado', 'message' => 'No posee permisos de acceso suficientes para la acción solicitada.']);
         }
         

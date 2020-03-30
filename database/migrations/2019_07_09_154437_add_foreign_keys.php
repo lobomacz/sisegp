@@ -109,16 +109,19 @@ class AddForeignKeys extends Migration
 
         Schema::table('funcionarios', function(Blueprint $table){
             $table->foreign('unidad_gestion_id')->references('id')->on('unidad_gestions')->onDelete('set null');
+            $table->foreign('rol_id')->references('id')->on('rols')->onDelete('restrict');
 
             $table->unique('correo');
             $table->unique('cedula');
         });
 
+        /*
         Schema::table('funcionario_rol', function(Blueprint $table){
             $table->foreign('funcionario_id')->references('id')->on('funcionarios')->onDelete('cascade');
             $table->foreign('rol_id')->references('id')->on('rols')->onDelete('cascade');
         });
-
+        */
+        
         Schema::table('permisos', function(Blueprint $table){
             $table->foreign('rol_id')->references('id')->on('rols')->onDelete('cascade');
         });

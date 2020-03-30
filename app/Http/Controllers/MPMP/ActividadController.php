@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\MPMP;
 
 use Illuminate\Http\Request;
 use App\Models\Actividad;
 use App\Models\Producto;
 use App\Models\Insumo;
 use App\Models\UnidadMedida;
+use Auth;
 
 class ActividadController extends Controller
 {
@@ -23,6 +24,10 @@ class ActividadController extends Controller
 
     	return view('mpmp.indice_actividades', ['titulo' => 'Actividades del producto', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'producto' => $producto, 'actividades' => $actividades]);
 
+    }
+
+    public function gestion(Request $request){
+        
     }
 
     public function nuevo(Request $request, $id){

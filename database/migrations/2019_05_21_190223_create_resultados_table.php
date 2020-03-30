@@ -18,7 +18,7 @@ class CreateResultadosTable extends Migration
             $table->unsignedBigInteger('proyecto_id');
             $table->char('codigo', 3);
             $table->string('descripcion', 400);
-            $table->string('formula', 200);
+            $table->string('formula', 200)->nullable();
             $table->unsignedInteger('unidad_medida_id');
             $table->boolean('aprobado')->default(false);
             $table->timestamps();
