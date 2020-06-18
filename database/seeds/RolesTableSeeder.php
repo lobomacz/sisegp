@@ -46,13 +46,17 @@ class RolesTableSeeder extends Seeder
             'ver_proyectos' => true,
         	'ingresar_proyectos' => true, 
         	'modificar_proyectos' => true,
+            //'ver_resultados' => true,
+            //'ver_planes' => true,
+            //'ver_productos' => true,
+            //'ver_actividades' => true,
         ]);
 
         //Permisos de director
         DB::table('permisos')->insert([
         	'rol_id' => 2,
+            'modificar_periodos' => true,
         	'aprobar_planes' => true,
-            'gestionar_planes' => true,
             'aprobar_productos' => true,
             'aprobar_resultados' => true,
         	'aprobar_actividades' => true,
@@ -64,6 +68,7 @@ class RolesTableSeeder extends Seeder
             'ver_resultados' => true,
             'ver_productos' => true,
             'ver_actividades' => true,
+            'ver_periodos' => true,
             'ver_planes' => true,
             'ver_solicitudes' => true,
         ]);
@@ -71,6 +76,7 @@ class RolesTableSeeder extends Seeder
         //Permisos de director-seplan
         DB::table('permisos')->insert([
         	'rol_id' => 3,
+            'modificar_periodos' => true,
         	'cerrar_planes' => true,
         	'aprobar_planes' => true,
             'eliminar_planes' => true,
@@ -89,6 +95,7 @@ class RolesTableSeeder extends Seeder
             'ver_resultados' => true,
             'ver_productos' => true,
             'ver_actividades' => true,
+            'ver_periodos' => true,
             'ver_planes' => true,
             'ver_solicitudes' => true,
         ]);
@@ -103,6 +110,7 @@ class RolesTableSeeder extends Seeder
             'ver_resultados' => true,
             'ver_productos' => true,
             'ver_actividades' => true,
+            'ver_periodos' => true,
             'ver_planes' => true,
             'ver_solicitudes' => true,
         ]);
@@ -110,18 +118,26 @@ class RolesTableSeeder extends Seeder
         //Permisos de digitador
         DB::table('permisos')->insert([
         	'rol_id' => 5,
+            'ver_periodos' => true,
+            'ingresar_periodos' => true,
+            //'modificar_periodos' => true,
+            'ver_planes' => true,
         	'ingresar_planes' => true,
         	'modificar_planes' => true,
+            'ver_productos' => true,
         	'ingresar_productos' => true,
         	'modificar_productos' => true,
             'eliminar_productos' => true,
+            'ver_resultados' => true,
         	'ingresar_resultados' => true,
         	'modificar_resultados' => true,
             'eliminar_resultados' => true,
+            'ver_actividades' => true,
         	'ingresar_actividades' => true,
         	'modificar_actividades' => true,
             'ejecutar_actividades' => true,
             'eliminar_actividades' => true,
+            'ver_solicitudes' => true,
         	'ingresar_solicitudes' => true,
         	'modificar_solicitudes' => true,
         ]);
@@ -129,18 +145,25 @@ class RolesTableSeeder extends Seeder
         //Permisos de digitador-adq
         DB::table('permisos')->insert([
         	'rol_id' => 6,
+            'ver_periodos' => true,
+            'ingresar_periodos' => true,
+            'ver_planes' => true,
         	'ingresar_planes' => true,
         	'modificar_planes' => true,
+            'ver_productos' => true,
         	'ingresar_productos' => true,
         	'modificar_productos' => true,
             'eliminar_productos' => true,
+            'ver_resultados' => true,
             'ingresar_resultados' => true,
             'modificar_resultados' => true,
             'eliminar_resultados' => true,
+            'ver_actividades' => true,
             'ingresar_actividades' => true,
             'modificar_actividades' => true,
             'ejecutar_actividades' => true,
             'eliminar_actividades' => true,
+            'ver_solicitudes' => true,
         	'ingresar_solicitudes' => true,
         	'modificar_solicitudes' => true,
         	'procesar_solicitudes' => true,

@@ -11,8 +11,8 @@ class Informe extends Model
     	return $this->belongsTo('App\Models\Actividad');
     }
 
-    public function documentos(){
-    	return $this->belongsToMany('App\Models\Documento');
+    public function documento(){
+    	return $this->belongsTo('App\Models\Documento');
     }
 
     public function fotos(){

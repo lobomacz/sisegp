@@ -21,7 +21,7 @@ class CreateActividadInsumoTable extends Migration
             $table->decimal('costo_unitario', 11, 2);
             $table->decimal('cantidad', 9, 2);
             $table->boolean('solicitado')->default(false);
-            $table->boolean('utilizado')->default(false);
+            $table->boolean('recibido')->default(false);
             $table->timestamps();
         });
     }

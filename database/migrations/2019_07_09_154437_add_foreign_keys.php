@@ -66,7 +66,7 @@ class AddForeignKeys extends Migration
         });
 
         Schema::table('periodos', function(Blueprint $table){
-            $table->foreign('periodo_anterior')->references('id')->on('periodos');
+            //$table->foreign('periodo_anterior')->references('id')->on('periodos');
         });
 
         Schema::table('proyecto_unidad_gestion', function(Blueprint $table){
@@ -77,14 +77,14 @@ class AddForeignKeys extends Migration
         });
 
         Schema::table('plans', function(Blueprint $table){
-            $table->foreign('periodo_id')->references('id')->on('periodos')->onDelete('restrict');
-            $table->foreign('unidad_gestion_id')->references('id')->on('unidad_gestions')->onDelete('restrict');
+            $table->foreign('periodo_unidad_id')->references('id')->on('periodo_unidads')->onDelete('restrict');
+            //$table->foreign('unidad_gestion_id')->references('id')->on('unidad_gestions')->onDelete('restrict');
         });
 
         Schema::table('plan_resultado', function(Blueprint $table){
-            $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
-            $table->foreign('resultado_id')->references('id')->on('resultados')->onDelete('cascade');
-            $table->unique(['plan_id', 'resultado_id']);
+            //$table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
+            //$table->foreign('resultado_id')->references('id')->on('resultados')->onDelete('cascade');
+            //$table->unique(['plan_id', 'resultado_id']);
         });
 
         Schema::table('plan_producto', function(Blueprint $table){
@@ -171,14 +171,17 @@ class AddForeignKeys extends Migration
             $table->unique(['documento_id', 'plan_id']);
         });
 
+        /*
         Schema::table('servicio_personals', function(Blueprint $table){
             $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
             $table->foreign('clasificador_id')->references('id')->on('clasificadors');
         });
 
+
         Schema::table('', function(Blueprint $table){
             
         });
+        */
 
         Schema::table('users', function(Blueprint $table){
 

@@ -17,11 +17,12 @@ class CreatePlanProductoTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('plan_id');
             $table->unsignedBigInteger('producto_id');
-            $table->decimal('meta', 7, 2)->nullable(false);
-            $table->decimal('logros', 7, 2)->default(0.00);
+            $table->decimal('meta', 7, 2);
+            $table->enum('consolidado_anual',['sumatoria','porcentaje','maxima', 'promedio','permanente']);
+            $table->decimal('logros', 7, 2)->nullable();
             $table->string('situacion_inicial', 500)->nullable();
             $table->string('situacion_resultado', 500)->nullable();
-            $table->string('dificultades', 500)->nullable();
+            $table->string('dificultades', 500)->default('ninguna');
             $table->string('soluciones', 500)->nullable();
             $table->timestamps();
         });

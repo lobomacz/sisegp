@@ -18,6 +18,7 @@ class CreateSolicitudsTable extends Migration
             $table->date('fecha');
             $table->enum('tipo_solicitud', ['gastos','proceso por concurso', 'proceso de ejecución de obra', 'compra menor para bienes', 'compra menor para servicios'])->nullable(false);
             $table->unsignedInteger('unidad_gestion_id');
+            //TODO: GENERAR UN MODELO PARA ACTIVIDADINSUMO
             $table->unsignedBigInteger('actividad_insumo_id');
             $table->string('justificacion', 400); //justificación de cantidad y calidad solicitados
             $table->decimal('monto', 11, 2);

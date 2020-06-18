@@ -70,7 +70,7 @@ class ProyectoController extends Controller
     	return view('proyectos.detalle', ['titulo' => 'Detalle de Proyecto', 'seccion' => self::SECCION, 'proyecto' => $proyecto, 'menu_list' => $mb->getMenu(), 'backroute' => $ruta, 'ruta_edit' => $ruta_edit, 'ruta_delete' => $ruta_delete, 'ruta_link' => $ruta_link, 'ruta_comunidad' => $ruta_comunidad, 'ruta_recycle' => $ruta_recycle, 'trashed' => $trashed]);
     }
 
-    public function nuevo(Request $request)
+    public function nuevo(Request $request, MenuBuilder $mb)
     {
     	if($request->isMethod('get')){
 
@@ -81,7 +81,7 @@ class ProyectoController extends Controller
 
             $ruta = route('NuevoProyecto');
 
-            $datos = ['titulo' => 'Ingreso de Proyecto', 'seccion' => self::SECCION, 'proyecto' => $proyecto, 'ruta' => $ruta, 'backroute' => $ruta, 'programas' => $programas, 'sectores' => $sectores];
+            $datos = ['titulo' => 'Ingreso de Proyecto', 'seccion' => self::SECCION, 'proyecto' => $proyecto, 'ruta' => $ruta, 'backroute' => $ruta, 'programas' => $programas, 'sectores' => $sectores, 'menu_list' => $mb->getMenu()];
 
             if (!$request->session()->has('errors')) {
 
@@ -497,7 +497,10 @@ class ProyectoController extends Controller
         return redirect()->route('VerProyecto', ['id' => $proyecto->id]);
     }
 
-    //PENDIENTE FUNCIÓN PARA EDITAR LOS RESULTADOS DE UN PROYECTO
+
+    public function editar_resultados(Request $request, MenuBuilder $mb, $id){
+        // PENDIENTE DE IMPLEMENTAR
+    }
     
     public function ingresar_resultados(Request $request, MenuBuilder $mb, $id){
 
@@ -509,16 +512,16 @@ class ProyectoController extends Controller
 
             $empty_rows = config('variables.campos_extra');
 
-            $datos = ['seccion' => self::SECCION, 'proyecto' => $proyecto, 'filas' => $empty_rows, 'ruta' => $ruta, 'backroute' => $ruta];
+            $datos = ['seccion' => self::SECCION, 'proyecto' => $proyecto, 'filas' => $empty_rows, 'ruta' => $ruta, 'backroute' => $ruta, 'menu_list' => $mb->getMenu()];
 
             toastr()->info(__('messages.required_fields'));
 
             return view('proyectos.resultados', $datos);
             
         } elseif ($request->isMethod('post')) {
-            # code...
+            
 
-            if ($request->has('resultados') && isset($request->resultados)) {
+            if ($request->has('resultados')) {
                 # code...
                 $datos = $request->resultados;
                 $filas = count($datos['codigo']);

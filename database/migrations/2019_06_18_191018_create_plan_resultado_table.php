@@ -18,7 +18,7 @@ class CreatePlanResultadoTable extends Migration
             $table->unsignedBigInteger('plan_id');
             $table->unsignedBigInteger('resultado_id');
             //Se ingresa balance_resultado a la hora de hacer informe del plan trimestral.
-            $table->string('balance_resultado',500)->nullable(); 
+            $table->string('balance',1000)->nullable(); 
             $table->timestamps();
         });
     }

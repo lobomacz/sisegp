@@ -15,9 +15,9 @@ class CreatePlansTable extends Migration
     {
         Schema::create('plans', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('periodo_id', 4);
-            $table->unsignedInteger('unidad_gestion_id');
-            $table->enum('tipo_plan', ['anual', 'trimestral']);
+            $table->unsignedBigInteger('periodo_unidad_id');
+            //$table->unsignedInteger('unidad_gestion_id');
+            //$table->enum('tipo', ['anl', 'tri']);
             $table->date('fecha_inicio');
             $table->date('fecha_final');
             $table->integer('trimestre')->nullable();

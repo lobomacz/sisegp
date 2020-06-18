@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Producto extends Model
 {
+    protected $guarded = ['id', 'aprobado'];
+
     public function resultado(){
     	return $this->belongsTo('App\Models\Resultado');
     }

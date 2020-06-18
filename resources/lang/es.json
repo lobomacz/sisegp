@@ -89,6 +89,7 @@
 	"ended":"finalizado",
 	"status":"estado",
 	"save":"guardar",
+	"saved":"guardado",
 	"reset":"limpiar",
 	"insert":"insertar",
 	"assign":"asignar",
@@ -128,5 +129,6 @@
 	"women":"mujeres",
 	"elders":"ancianos",
 	"handicapped":"discapacitados",
-	"invalid id":"id inválido"
+	"invalid id":"id inválido",
+	"unrecognized order":"orden no reconocida"
 }

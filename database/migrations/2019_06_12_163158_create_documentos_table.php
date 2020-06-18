@@ -18,7 +18,7 @@ class CreateDocumentosTable extends Migration
             $table->string('nombre', 50);
             $table->string('url', 200);
             $table->string('descripcion', 100);
-            $table->enum('tipo_documento', ['pdf', 'word', 'excel']);
+            $table->enum('tipo', ['pdf', 'word', 'excel']);
             $table->timestamps();
         });
     }

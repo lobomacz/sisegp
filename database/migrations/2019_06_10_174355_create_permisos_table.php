@@ -39,6 +39,9 @@ class CreatePermisosTable extends Migration
             $table->boolean('cancelar_actividades')->default(false);
             $table->boolean('ejecutar_actividades')->default(false);
             $table->boolean('eliminar_actividades')->default(false);
+            $table->boolean('ver_periodos')->default(false);
+            $table->boolean('ingresar_periodos')->default(false);
+            $table->boolean('modificar_periodos')->default(false);
             $table->boolean('ver_planes')->default(false);
             $table->boolean('gestionar_planes')->default(false);
             $table->boolean('ingresar_planes')->default(false);

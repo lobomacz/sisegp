@@ -9,6 +9,7 @@ use App\Models\UnidadGestion;
 use App\Models\UnidadMedida;
 use App\Models\Resultado;
 use App\Models\Proyecto;
+use App\Models\Producto;
 use Auth;
 
 class ResultadoController extends Controller
@@ -26,7 +27,7 @@ class ResultadoController extends Controller
     */
     const SECCION = 'result indicators';
 
-    public function lista(MenuBuilder $mb, $page, $todos=null){
+    public function lista(MenuBuilder $mb, $page=1, $todos=null){
 
         $proyectos = null;
         $funcionario = Auth::user()->funcionario;
@@ -49,7 +50,7 @@ class ResultadoController extends Controller
             }
 
 
-            return view('mpmp.lista_resultados', ['seccion' => self::SECCION, 'unidades' => $unidades, 'proyectos' => $proyectos, 'todos' => $todos, 'backroute' => $ruta, 'menu_list' => $mb->getMenu()]);
+            return view('resultados.lista_resultados', ['seccion' => self::SECCION, 'unidades' => $unidades, 'proyectos' => $proyectos, 'todos' => $todos, 'backroute' => $ruta, 'menu_list' => $mb->getMenu()]);
 
         } else {
 
@@ -62,13 +63,13 @@ class ResultadoController extends Controller
                 });
             }   
 
-            return view('mpmp.Lista_resultados_unidad', ['seccion' => self::SECCION, 'proyectos' => $proyectos, 'todos' => $todos, 'backroute' => $ruta, 'menu_list' => $mb->getMenu()]);
+            return view('resultados.lista_resultados_unidad', ['seccion' => self::SECCION, 'proyectos' => $proyectos, 'todos' => $todos, 'backroute' => $ruta, 'menu_list' => $mb->getMenu()]);
 
         }
     }
 
 
-    public function lista_filtro(MenuBuilder $mb, $filtro, $valor, $page, $todos=null){
+    public function lista_filtro(MenuBuilder $mb, $filtro, $valor, $page=1, $todos=null){
 
         $funcionario = Auth::user()->funcionario;
         $limite = config('variables.limite_lista', 20);
@@ -85,7 +86,7 @@ class ResultadoController extends Controller
 
                 $datos = ['seccion' => self::SECCION, 'backroute' => $ruta, 'proyecto' => $proyecto, 'resultados' => $resultados, 'menu_list' => $mb->getMenu()];
 
-                return view('mpmp.lista_resultados_proyecto', $datos);
+                return view('resultados.lista_resultados_proyecto', $datos);
                 */
                 //$datos = ['seccion' => self::SECCION, 'backroute' => $ruta, 'proyecto' => $proyecto, 'resultados' => $resultados, 'menu_list' => $mb->getMenu()];
 
@@ -104,7 +105,7 @@ class ResultadoController extends Controller
 
                 $datos = ['seccion' => self::SECCION, 'backroute' => $ruta, 'unidad' => $unidad, 'proyectos' => $proyectos, 'menu_list' => $mb->getMenu()];
 
-                return view('Lista_resultados_unidad', $datos);
+                return view('lista_resultados_unidad', $datos);
 
             }
 
@@ -117,7 +118,7 @@ class ResultadoController extends Controller
 
             $datos = ['seccion' => self::SECCION, 'backroute' => $ruta, 'proyecto' => $proyecto, 'resultados' => $resultados, 'menu_list' => $mb->getMenu()];
 
-            return view('mpmp.lista_resultados_proyecto', $datos);
+            return view('resultados.lista_resultados_proyecto', $datos);
             */
             //$datos = ['seccion' => self::SECCION, 'backroute' => $ruta, 'proyecto' => $proyecto, 'resultados' => $resultados, 'menu_list' => $mb->getMenu()];
 
@@ -133,7 +134,7 @@ class ResultadoController extends Controller
 
     }
 
-    private function filtro_proyecto(MenuBuilder $mb, $valor, $ruta){
+    public function filtro_proyecto(MenuBuilder $mb, $valor, $ruta){
 
         $proyecto = Proyecto::findOrFail($valor);
 
@@ -141,7 +142,7 @@ class ResultadoController extends Controller
 
         $datos = ['seccion' => self::SECCION, 'backroute' => $ruta, 'proyecto' => $proyecto, 'resultados' => $resultados, 'menu_list' => $mb->getMenu()];
 
-        return view('mpmp.lista_resultados_proyecto', $datos);
+        return view('resultados.lista_resultados_proyecto', $datos);
 
     }
 
@@ -167,7 +168,7 @@ class ResultadoController extends Controller
 
             }
 
-            return view('mpmp.nuevo_resultado', ['seccion' => self::SECCION, 'unidad_gestion' => $unidad_gestion, 'proyectos' => $proyectos, 'resultado' => $resultado, 'ruta' => $ruta, 'backroute' => $ruta, 'unidades' => $unidades_medida, 'menu_list' => $mb->getMenu()]);
+            return view('resultados.nuevo', ['seccion' => self::SECCION, 'unidad_gestion' => $unidad_gestion, 'proyectos' => $proyectos, 'resultado' => $resultado, 'ruta' => $ruta, 'backroute' => $ruta, 'unidades' => $unidades_medida, 'menu_list' => $mb->getMenu()]);
 
 
         } elseif ($request->isMethod('post')) {
@@ -213,7 +214,7 @@ class ResultadoController extends Controller
         $ruta_edit = route('EditarResultado', ['id' => $id]);
         $ruta_aprobar= route('AprobarResultado', ['id' => $id]);
 
-        return view('mpmp.ver_resultado', ['secccion' => self::SECCION, 'resultado' => $resultado, 'backroute' => $ruta, 'ruta_edit' => $ruta_edit, 'ruta_delete' => $ruta_delete, 'ruta_aprobar' => $ruta_aprobar, 'menu_list' => $mb->getMenu()]);
+        return view('resultados.ver', ['secccion' => self::SECCION, 'resultado' => $resultado, 'backroute' => $ruta, 'ruta_edit' => $ruta_edit, 'ruta_delete' => $ruta_delete, 'ruta_aprobar' => $ruta_aprobar, 'menu_list' => $mb->getMenu()]);
 
     }
 
@@ -270,7 +271,7 @@ class ResultadoController extends Controller
 
             }
 
-            return view('mpmp.editar_resultado', ['seccion' => self::SECCION, 'resultado' => $resultado, 'unidades' => $unidades, 'proyectos' => $proyectos, 'ruta' => $ruta, 'backroute' => $ruta, 'menu_list' => $mb->getMenu()]);
+            return view('resultados.editar', ['seccion' => self::SECCION, 'resultado' => $resultado, 'unidades' => $unidades, 'proyectos' => $proyectos, 'ruta' => $ruta, 'backroute' => $ruta, 'menu_list' => $mb->getMenu()]);
 
         } elseif ($request->isMethod('post')) {
             # code...
@@ -326,6 +327,11 @@ class ResultadoController extends Controller
     }
 
 
+    public function editar_productos(Request $request, MenuBuilder $mb, $id){
+        // PENDIENTE DE IMPLEMENTAR
+    }
+
+
     public function ingresar_productos(Request $request, MenuBuilder $mb, $id){
 
         $resultado = Resultado::findOrFail($id);
@@ -333,11 +339,76 @@ class ResultadoController extends Controller
         $ruta = route('IngresarProductosResultado', ['id' => $id]);
 
         if ($request->isMethod('get')) {
-            # code...
-            $extra_rows = config('variables.extra_rows');
+            
+            $empty_rows = config('variables.extra_rows');
+
+            $datos = ['seccion' => self::SECCION, 'resultado' => $resultado, 'filas' => $empty_rows, 'ruta' => $ruta, 'backroute' => $ruta, 'menu_list' => $mb->getMenu()];
+
+            toastr()->info(__('messages.required_fields'));
+
+            return view('resultados.productos', $datos);
             
         } else if ($request->isMethod('post')) {
-            # code...
+            
+            if ($request->has('productos')) {
+                
+                $datos = $request->productos;
+                $filas = count($datos['codigo']);
+                $saved = 0;
+
+                for ($i=0; $i < $filas; $i++) { 
+                    # code...
+                    if ((isset($datos['codigo'] && strlen($datos['codigo']) > 0) && (isset($datos['descripcion']) && strlen($datos['descripcion']) > 0)) {
+                        
+                        try {
+
+                            $producto = Producto::create([
+                                'resultado_id' => $resultado->id,
+                                'codigo' => $datos['codigo'][$i],
+                                'descripcion' => $datos['descripcion'][$i],
+                                'formula' => $datos['formula'][$i],
+                                'unidad_medida_id' => $datos['unidad_medida_id'][$i],
+                            ]);
+
+                            $saved++;
+                            
+                        } catch (Exception $e) {
+
+                            error_log("Excepción al registrar producto de resultado {$resultado->codigo}. ".$e->getMessage());
+
+                            toastr()->error(strtoupper(__('messages.critical_error')), strtoupper(__('Operation Error')));
+
+                            return redirect()->route('error');
+                            
+                        }
+
+                    } else {
+
+                        break;
+
+                    }
+                }
+
+                if ($saved > 0) {
+                    
+                    toastr()->success("{$saved} ".__('messages.records_saved'), strtoupper(__('Operation Success')));
+
+                } else {
+
+                    toastr()->info(__('messages.no_records_saved'));
+
+                }
+
+                return redirect()->route('VerResultado', ['id' => $resultado->id]);
+
+            } else {
+
+                toastr()->error(__('messages.registration_error'), strtoupper(__('Operation Error')));
+
+
+                return redirect($ruta);
+
+            }
         }
     }
 

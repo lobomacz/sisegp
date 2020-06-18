@@ -154,88 +154,123 @@ Route::match(['get','post'], '/resultados/{id}/ingresar-productos/', 'MPMP\Resul
 
 //RUTAS DE ADMINISTRACION DE INDICADORES DE PRODUCTO DE PROYECTOS
 
-Route::get('/productos', 'MPMP\ProductoController@index')->name('IndiceProductos')->middleware('auth', 'check.permissions:ver_productos');
+Route::get('/productos/page/{page}', 'MPMP\ProductoController@lista')->where('page', '[0-9]+')->name('ListaProductos')->middleware('auth', 'check.permissions:ver_productos', 'language');
 
-Route::get('/productos/page/{page}/{todos?}', 'MPMP\ProductoController@lista')->where('page', '[0-9]+')->name('ListaProductos')->middleware('auth', 'check.permissions:ver_productos');
+Route::get('/productos/{id}/ver', 'MPMP\ProductoController@ver')->where('id', '[0-9]+')->name('VerProducto')->middleware('auth', 'check.permissions:ver_productos', 'language');
 
-Route::get('/productos/{id}/ver', 'MPMP\ProductoController@ver')->where('id', '[0-9]+')->name('VerProducto')->middleware('auth', 'check.permissions:ver_productos');
-
-
-Route::get('/resultados/{id}/productos', 'MPMP\ProductoController@productosResultado')->where('id', '[0-9]+')->name('ProductosResultado')->middleware('auth', 'check.permissions:ver_productos');
-
-Route::match(['get', 'post'], '/resultados/{id}/productos/nuevo', 'MPMP\ProductoController@nuevo')->where('id', '[0-9]+')->name('NuevoProducto')->middleware('auth', 'check.permissions:ingresar_productos');
+Route::match(['get', 'post'], '/productos/nuevo', 'MPMP\ProductoController@nuevo')->name('NuevoProducto')->middleware('auth', 'check.permissions:ingresar_productos', 'language');
 
 
-Route::match(['get', 'post'], '/productos/{id}/editar', 'MPMP\ProductoController@editar')->where('id', '[0-9]+')->name('EditarProducto')->middleware('auth', 'check.permissions:modificar_productos');
+Route::match(['get', 'post'], '/productos/{id}/editar', 'MPMP\ProductoController@editar')->where('id', '[0-9]+')->name('EditarProducto')->middleware('auth', 'check.permissions:modificar_productos', 'language');
 
 Route::post('/productos/{id}/eliminar', 'MPMP\ProductoController@eliminar')->where('id', '[0-9]+')->name('EliminarProducto')->middleware('auth', 'check.permissions:eliminar_productos');
 
 Route::get('/productos/{id}/aprobar', 'MPMP\ProductoController@aprobar')->where('id', '[0-9]+')->name('AprobarProducto')->middleware('auth', 'check.permissions:aprobar_productos');
+
+Route::match(['get','post'], '/productos/{id}/ingresar-actividades', 'MPMP\ProductoController@ingresar_actividades')->where('id', '[0-9]+')->name('IngresarActividadesProducto')->middleware('auth', 'check.permissions:ingresar_actividades', 'language');
 
 
 //
 // RUTAS PARA PROCESAR DATOS DE ACTIVIDADES POR INDICADOR DE PRODUCTO
 //
 
-Route::get('/actividades', 'MPMP\ActividadController@index')->name('IndiceActividades')->middleware('auth', 'check.permissions:ver_actividades');
+// Route::get('/actividades', 'MPMP\ActividadController@index')->name('IndiceActividades')->middleware('auth', 'check.permissions:ver_actividades');
 
-Route::get('/actividades/page/{page}/{todos?}', 'MPMP\ActividadController@lista')->where('page', '[0-9]+')->name('ListaActividades')->middleware('auth', 'check.permissions:ver_actividades');
+Route::get('/actividades/page/{page}/{todos?}', 'MPMP\ActividadController@lista')->where('page', '[0-9]+')->name('ListaActividades')->middleware('auth', 'check.permissions:ver_actividades', 'language');
 
-Route::get('/producto/{id}/actividades', 'MPMP\ActividadController@actividadesProducto')->where('id', '[0-9]+')->name('ActividadesProducto')->middleware('auth', 'check.permissions:ver_actividades');
+//Route::get('/producto/{id}/actividades', 'MPMP\ActividadController@actividadesProducto')->where('id', '[0-9]+')->name('ActividadesProducto')->middleware('auth', 'check.permissions:ver_actividades');
 
-Route::get('/actividades/{id}/ver', 'MPMP\ActividadController@ver')->where('id', '[0-9]+')->name('VerActividad')->middleware('auth', 'check.permissions:ver_actividades');
+Route::match(['get', 'post'], '/actividades/nuevo', 'MPMP\ActividadController@nuevo')->where('id', '[0-9]+')->name('NuevaActividad')->middleware('auth', 'check.permissions:ingresar_actividades', 'language');
 
-Route::match(['get', 'post'], '/actividades/nuevo', 'MPMP\ActividadController@nuevo')->where('id', '[0-9]+')->name('NuevaActividad')->middleware('auth', 'check.permissions:ingresar_actividades');
 
-Route::match(['get', 'post'], '/actividades/{id}/editar', 'MPMP\ActividadController@editar')->where('id', '[0-9]+')->name('EditarActividad')->middleware('auth', 'check.permissions:modificar_actividades');
+Route::get('/actividades/{id}/ver', 'MPMP\ActividadController@ver')->where('id', '[0-9]+')->name('VerActividad')->middleware('auth', 'check.permissions:ver_actividades', 'language');
 
-Route::get('/actividades/{id}/aprobar', 'MPMP\ActividadController@aprobar')->where('id', '[0-9]+')->name('AprobarActividad')->middleware('auth', 'check.permissions:aprobar_actividades');
 
-Route::get('/actividades/{id}/cancelar', 'MPMP\ActividadController@cancelar')->where('id', '[0-9]+')->name('CancelarActividad')->middleware('auth', 'check.permissions:cancelar_actividades');
+Route::match(['get', 'post'], '/actividades/{id}/editar', 'MPMP\ActividadController@editar')->where('id', '[0-9]+')->name('EditarActividad')->middleware('auth', 'check.permissions:modificar_actividades', 'language');
 
-Route::get('/actividades/{id}/ejecutar', 'MPMP\ActividadController@ejecutar')->where('id', '[0-9]+')->name('EjecutarActividad')->middleware('auth', 'check.permissions:ejecutar_actividades');
+Route::get('/actividades/{id}/accion/{accion}', 'MPMP\ActividadController@acciones')->where(['id' => '[0-9]+', 'accion' => '[A-Za-z]+'])->name('AccionActividad')->middleware('auth', 'language');
+
+//Route::get('/actividades/{id}/cancelar', 'MPMP\ActividadController@cancelar')->where('id', '[0-9]+')->name('CancelarActividad')->middleware('auth', 'check.permissions:cancelar_actividades');
+
+
 
 Route::post('/actividades/{id}/eliminar', 'MPMP\ActividadController@eliminar')->where('id', '[0-9]+')->name('EliminarActividad')->middleware('auth', 'check.permissions:eliminar_actividades');
 
-Route::match(['get', 'post'], '/actividades/{id}/insumos/page/{page}', 'MPMP\ActividadController@insumos')->where(['id' => '[0-9]+', 'page' => '[0-9]+'])->name('InsumosActividad')->middleware('auth', 'check.permissions:modificar_actividades');
+Route::match(['get', 'post'], '/actividades/{id}/insumos', 'MPMP\ActividadController@insumos')->where('id', '[0-9]+')->name('InsumosActividad')->middleware('auth', 'check.permissions:modificar_actividades', 'language');
 
-Route::match(['get', 'post'], '/actividades/{id}/insumos/editar', 'MPMP\ActividadController@editar_insumos')->where('id', '[0-9]+')->name('EditarInsumosActividad')->middleware('auth', 'check.permissions:modificar_actividades');
+Route::match(['get', 'post'], '/actividades/{id}/insumos/{idd}/editar', 'MPMP\ActividadController@editar_insumos')->where(['id' => '[0-9]+', 'idd' => '[0-9]+'])->name('EditarInsumosActividad')->middleware('auth', 'check.permissions:modificar_actividades', 'language');
 
-Route::match(['get', 'post'],'/actividades/{id}/informe', 'MPMP\ActividadController@informe')->where('id', '[0-9]+')->name('InformeActividad')->middleware('auth');
+Route::post('/actividades/{id}/insumos/{idd}/eliminar', 'MPMP\ActividadController@eliminar_insumos')->where(['id' => '[0-9]+', 'idd' => '[0-9]+'])->name('EliminarInsumosActividad')->middleware('auth', 'check.permissions:modificar_actividades');
 
-Route::get('/actividades/{id}/informe/descargar/{tipo}', 'MPMP\ActividadController@documento_informe')->where(['id' => '[0-9]+', 'tipo' => '[A-Za-z]{3}'])->name('DescargaInformeActividad')->middleware('auth');
+Route::match(['get', 'post'],'/actividades/{id}/informe/{pid?}', 'MPMP\ActividadController@informe')->where('id', '[0-9]+')->name('InformeActividad')->middleware('auth', 'check.permissions:ingresar_planes', 'language');
+
+Route::post('/actividades/{id}/informe/anular', 'MPMP\ActividadController@anular_informe')->where('id', '[0-9]+')->name('AnularInformeActividad')->middleware('auth', 'check.rol:superusuario');
+
+#Route::get('/actividades/{id}/informe/descargar/{tipo}', 'MPMP\ActividadController@documento_informe')->where(['id' => '[0-9]+', 'tipo' => '[A-Za-z]{3}'])->name('DescargaInformeActividad')->middleware('auth');
+
+//
+// Rutas para administración de PERIODOS POR UNIDAD
+//
+
+Route::get('/periodos/page/{page?}', 'MPMP\PeriodoController@lista')->name('ListaPeriodoUnidad')->middleware('auth', 'check.permissions:ver_periodos', 'language');
+
+Route::get('/periodos/{id}/ver', 'MPMP\PeriodoController@ver')->where('id', '[0-9]+')->name('VerPeriodoUnidad')->middleware('auth', 'check.permissions:ver_periodos', 'language');
+
+Route::post('/periodos/{id}/{accion}', 'MPMP\PeriodoController@accion')->where(['id' => '[0-9]+', 'accion' => '[a-z]+'])->name('AccionPeriodoUnidad')->middleware('auth', 'check.permissions:gestionar_periodos');
+
+Route::post('/periodo/{id}/activar-todos', 'MPMP\PeriodoController@activarTodos')->where('id', '[0-9]+')->name('ActivarTodosPeriodos')->middleware('auth', 'check.permissions:gestionar_periodos');
+
+Route::match(['get', 'post'], '/periodos/nuevo', 'MPMP\PeriodoController@nuevo')->name('NuevoPeriodoUnidad')->middleware('auth', 'check.permissions:ingresar_periodos', 'language');
+
+Route::match(['get', 'post'], '/periodos/{id}/editar', 'MPMP\PeriodoController@editar')->where('id', '[0-9]+')->name('EditarPeriodoUnidad')->middleware('auth', 'check.permissions:modificar_periodos', 'language');
+
+Route::match(['get', 'post'], '/periodo/{id}/resultados', 'MPMP\PeriodoController@resultados')->where('id', '[0-9]+')->name('PeriodoUnidadResultados')->middleware('auth', 'check.permissions:modificar_periodos');
+
+//Route::match(['get', 'post'], '/periodo/{id}/resultados/add')->where('id', '[0-9]+')->name('AgregarResultadoPeriodo')->middleware('auth', 'check.permissions:modificar_periodos');
+
+Route::post('/periodo/{id}/resultado/{rid}/remover', 'MPMP\PeriodoController@remover_resultado')->where(['id' => '[0-9]+', 'rid' => '[0-9]+'])->name('RemoverResultadoPeriodo')->middleware('auth', 'check.permissions:modificar_periodos');
 
 //
 // Rutas para administración de PLANES 
 //
 
-Route::view('/planes', 'mpmp.planes')->name('IndicePlanes')->middleware('auth', 'check.permissions:ver_planes');
+Route::get('/planes/page/{page}/{todos?}', 'MPMP\PlanController@lista')->where(['page' => '[0-9]+', 'todos' => '[a-z]+'])->name('ListaPlanes')->middleware('auth', 'check.permissions:ver_planes', 'language');
 
-Route::get('/planes/{tipo}/page/{page}/{periodo?}', 'MPMP\PlanController@lista')->where(['tipo' => '[a-z]+', 'periodo' => '[0-9]{4}', 'page' => '[0-9]+'])->name('ListaPlanes')->middleware('auth');
+Route::get('/planes/{pid}/page/{page}', 'MPMP\PlanController@lista_planes_periodo')->where(['page' => '[0-9]+', 'pid' => '[0-9]4'])->name('ListaPlanesPeriodo')->middleware('auth', 'check.permissions:ver_planes', 'language');
 
-Route::match(['get', 'post'], '/planes/nuevo/', 'MPMP\PlanController@nuevo')->name('NuevoPlan')->middleware('auth', 'check.permissions:ingresar_planes');
+#Route::get('/planes/{tipo}/page/{page}/{todos?}', 'MPMP\PlanController@lista')->where(['tipo' => '[a-z]+', 'periodo' => '[0-9]{4}', 'page' => '[0-9]+'])->name('ListaPlanes')->middleware('auth');
 
-Route::get('/planes/{id}/ver', 'MPMP\PlanController@ver')->where('id', '[0-9]+')->name('VerPlan')->middleware('auth', 'check.permissions:ver_planes');
+Route::match(['get', 'post'], '/planes/nuevo/', 'MPMP\PlanController@nuevo')->name('NuevoPlan')->middleware('auth', 'check.permissions:ingresar_planes', 'language');
 
-Route::match(['get', 'post'], '/planes/{id}/editar', 'MPMP\PlanController@editar')->where('id', '[0-9]+')->name('EditarPlan')->middleware('auth', 'check.permissions:modificar_planes');
+Route::get('/planes/{id}/ver', 'MPMP\PlanController@ver')->where('id', '[0-9]+')->name('VerPlan')->middleware('auth', 'check.permissions:ver_planes', 'language');
 
-Route::post('/planes/{id}/eliminar', 'MPMP\PlanController@eliminar')->where('id', '[0-9]+')->name('EliminarPlan')->middleware('auth', 'check.rol:superusuario');
+Route::match(['get', 'post'], '/planes/{id}/editar', 'MPMP\PlanController@editar')->where('id', '[0-9]+')->name('EditarPlan')->middleware('auth', 'check.permissions:modificar_planes', 'language');
+
+Route::post('/planes/{id}/eliminar', 'MPMP\PlanController@eliminar')->where('id', '[0-9]+')->name('EliminarPlan')->middleware('auth', 'check.permissions:eliminar_planes');
 
 Route::get('/planes/{id}/aprobar', 'MPMP\PlanController@aprobar')->where('id', '[0-9]+')->name('AprobarPlan')->middleware('auth', 'check.permissions:aprobar_planes');
 
-Route::get('/planes/{id}/activar', 'MPMP\PlanController@activar')->where('id', '[0-9]+')->name('ActivarPlanes')->middleware('auth', 'check.permissions:modificar_planes');
+Route::get('/planes/{id}/activar', 'MPMP\PlanController@activar')->where('id', '[0-9]+')->name('ActivarPlanes')->middleware('auth', 'check.permissions:gestionar_planes');
 
-Route::get('/planes/gestion/{gestion}', 'MPMP\PlanController@gestion')->where('gestion', '[a-z]+')->name('GestionPlanes')->middleware('auth','check.permissions:gestionar_planes');
+//Route::get('/planes/gestion/{gestion}', 'MPMP\PlanController@gestion')->where('gestion', '[a-z]+')->name('GestionPlanes')->middleware('auth','check.permissions:gestionar_planes');
 
-Route::get('/planes/{id}/cerrar', 'MPMP\PlanController@cerrar')->where('id', '[0-9]+')->name('CerrarPlan')->middleware('auth', 'check.permissions:cerrar_planes');
+Route::post('/planes/{id}/cerrar', 'MPMP\PlanController@cerrar')->where('id', '[0-9]+')->name('CerrarPlan')->middleware('auth', 'check.permissions:cerrar_planes');
 
-Route::get('planes/{id}/detalle', 'MPMP\PlanController@detalle')->where('id', '[0-9]+')->name('DetallePlan')->middleware('auth', 'check.permissions:ver_planes');
+Route::post('/planes/{id}/abrir', 'MPMP\PlanController@abrir')->where('id', '[0-9]+')->name('AbrirPlan')->middleware('auth', 'check.permissions:gestionar_planes');
 
-Route::match(['get', 'post'], '/planes/{id}/resultados', 'MPMP\PlanController@resultados')->where('id', '[0-9]+')->name('PlanResultados')->middleware('auth', 'check.permissions:modificar_planes');
+Route::match(['get', 'post'], '/planes/{pid}/actividades/{id}/ejecutar', 'MPMP\ActividadController@ejecutar')->where(['id' => '[0-9]+', 'pid' => '[0-9]+'])->name('EjecutarActividad')->middleware('auth', 'check.permissions:ejecutar_actividades', 'language');
+
+Route::match(['get', 'post'], '/planes/{$id}/informe', 'MPMP\PlanController@informe')->where('id', '[0-9]+')->name('InformePlan')->middleware('auth', 'check.permissions:modificar_planes', 'language');
+
+//Route::get('planes/{id}/detalle', 'MPMP\PlanController@detalle')->where('id', '[0-9]+')->name('DetallePlan')->middleware('auth', 'check.permissions:ver_planes');
 
 Route::match(['get', 'post'], '/planes/{id}/productos', 'MPMP\PlanController@productos')->where('id', '[0-9]+')->name('PlanProductos')->middleware('auth', 'check.permissions:modificar_planes');
 
-Route::match(['get', 'post'], '/planes/{id}/actividades', 'MPMP\PlanController@PlanActividades')->where('id', '[0-9]+')->name('PlanActividades')->middleware('auth', 'check.permissions:modificar_planes');
+Route::post('/planes/{id}/productos/{pid}/remover', 'MPMP\PlanController@remover_producto')->where(['id' => '[0-9]+', 'pid' => '[0-9]+'])->name('RemoverProducto')->middleware('auth', 'check.permissions:modificar_planes');
+
+Route::match(['get', 'post'], '/planes/{id}/actividades', 'MPMP\PlanController@actividades')->where('id', '[0-9]+')->name('PlanActividades')->middleware('auth', 'check.permissions:modificar_planes', 'language');
+
+Route::post('/planes/{id}/actividades/{aid}/remover', 'MPMP\PlanController@remover_actividad')->where(['id' => '[0-9]+', 'aid' => '[0-9]+'])->name('RemoverActividad')->middleware('auth', 'check.permissions:modificar_planes');
 
 Route::match(['get', 'post'], '/planes/{id}/servicios-personales', 'MPMP\PlanController@servicios_personales')->where('id', '[0-9]+')->name('PlanServiciosPersonales')->middleware('auth', 'check.permissions:modificar_planes');
 

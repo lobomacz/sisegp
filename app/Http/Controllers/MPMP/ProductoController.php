@@ -3,135 +3,331 @@
 namespace App\Http\Controllers\MPMP;
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Libreria\MenuBuilder;
 use App\Models\Producto;
 use App\Models\Resultado;
 use App\Models\UnidadMedida;
+use App\Models\Actividad;
 use Auth;
 
 class ProductoController extends Controller
 {
-    //
-    protected $funcionario = Auth::user()->funcionario;
     
-    protected $seccion = "Indicadores de Producto";
+    
+    const SECCION = 'product indicators';
 
-    public function index($id){
 
-    	 $resultado = Resultado::findOrFail($id);
+    public function lista(MenuBuilder $mb, $page=1){
 
-    	 $productos = $resultado->productos;
+        $funcionario = Auth::user()->funcionario;
 
-    	 return view('mpmp.indice_productos', ['titulo' => 'Lista de Indicadores de Producto', 'funcionario' => $this->funcionario, 'seccion' => $this->seccion, 'resultado' => $resultado, 'productos' => $productos]);
+        $limite = config('variables.limite_lista', 20);
+        $ruta = route('ListaProductos', ['page' => $page]);
+
+        $proyectos = $funcionario->unidadGestion->proyectos->where('ejecutado',false)->paginate($limite);
+
+        $datos = ['seccion' => self::SECCION, 'proyectos' => $proyectos, 'backroute' => $ruta, 'menu_list' => $mb->getMenu(), 'page' => $page, 'unidad_gestion' => $funcionario->unidadGestion];
+
+        return view('productos.lista', $datos);
 
     }
 
-    public function gestion(Request $request){
-        
+
+    public function ver(MenuBuilder $mb, $id){
+
+        $producto = Producto::findOrFail($id);
+
+        $ruta = route('VerProducto', ['id' => $id]);
+
+        $ruta_edit = route('EditarProducto', ['id' => $id]);
+
+        $ruta_delete = route('EliminarProducto', ['id' => $id]);
+
+        $ruta_aprobar = route('AprobarProducto', ['id' => $id]);
+
+        return view('productos.detalle', ['seccion' => self::SECCION, 'producto' => $producto, 'backroute' => $ruta, 'ruta_edit' => $ruta_edit, 'ruta_delete' => $ruta_delete, 'ruta_aprobar' => $ruta_aprobar, 'menu_list' => $mb->getMenu()]);
+
     }
 
-    public function nuevo(Request $request, $id){
+
+    public function nuevo(Request $request, MenuBuilder $mb){
 
     	if ($request->isMethod('get')) {
 
+            $resultados = null;
+
+            $proyectos = Auth::user()->funcionario->unidadGestion->proyectos->where('ejecutado', false);
+
+            foreach ($proyectos as $proyecto) {
+                
+                if ($resultados == null) {
+                    
+                    $resultados = $proyecto->resultados;
+
+                } else {
+
+                    $resultados = $proyecto->resultados->union($resultados);
+                }
+            }
+
     		$unidades = UnidadMedida::all();
+
     		$producto = new Producto;
 
-            $ruta = route('NuevoProducto', ['id' => $id]);
+            $ruta = route('NuevoProducto');
 
-    		return view('mpmp.formulario_producto', ['titulo' => 'Ingreso de Indicadores de Producto', 'funcionario' => $this->funcionario, 'seccion' => $this->seccion, 'resultado_id' => $id, 'producto' => $producto, 'route' => $ruta, 'unidades' => $unidades]);
+            if (!$request->session()->has('errors')) {
+                
+                toastr()->info(__('messages.required_fields'));
+
+            } else {
+
+                toastr()->error(__('messages.validation_error'), strtoupper(__('Validation Error')));
+
+            }
+
+    		return view('productos.nuevo', ['seccion' => self::SECCION, 'producto' => $producto, 'ruta' => $ruta, 'backroute' => $ruta, 'unidades' => $unidades, 'resultados' => $resultados, 'menu_list' => $mb->getMenu()]);
 
     	}elseif ($request->isMethod('post')) {
 
-    		if (!$request->has(['codigo_producto', 'descripcion'])) {
+            $request->validate([
+                'codigo' => 'bail|alpha_dash|max:5|required',
+                'resultado_id' => 'integer|required',
+                'descripcion' => 'alpha_dash|max:600|required',
+                'formula' => 'alpha_dash|max:200|present|nullable',
+                'unidad_medida_id' => 'integer|nullable',
+            ]);
 
-    			return view('alert', ['titulo' => 'Existe inconsistencia de datos', 'seccion' => $this->seccion, 'mensaje' => 'Los campos codigo de producto y descripción son obligatorios.', 'funcionario' => $this->funcionario]);
+            $producto = null;
 
-    		}else{
+            try {
 
-    			$resultado = Resultado::findOrFail($id);
-    			$producto = new Producto;
+                $producto = Producto::create($request->input());
+                
+            } catch (Exception $e) {
 
-    			$producto->codigo_producto = $request->codigo_producto;
-    			$producto->descripcion = $request->descripcion;
-    			$producto->formula = $request->formula;
-    			$producto->unidad_medida_id = $request->unidad_medida_id;
+                error_log("Excepción al ingresar Producto. ".$e->getMessage());
 
-    			$resultado->productos()->save($producto);
+                toastr()->error(__('messages.critical_error'), strtoupper(__('Operation Error')));
 
-    			return redirect()->route('IndiceProductos', ['id' => $id]);
+                return redirect()->route('error');
+                
+            }
 
-    		}
+            if ($producto != null) {
+                
+                toastr()->success(__('messages.registration_success'), strtoupper(__('Operation Success')));
+
+                return redirect()->route('VerProducto', ['id' => $producto->id]);
+            }
+
     	}
     }
+    
 
-    public function ver($id, $id_prod){
+    public function editar(Request $request, MenuBuilder $mb, $id){
 
-    	$producto = Producto::findOrFail($id_prod);
-
-    	return view('mpmp.detalle_producto', ['titulo' => 'Datos de Indicador de Producto', 'funcionario' => $this->funcionario, 'seccion' => $this->seccion, 'producto' => $producto, 'id_resultado' => $id]);
-
-    }
-
-    public function editar(Request $request, $id, $id_prod){
+        $producto = Producto::findOrFail($id);
 
     	if ($request->isMethod('get')) {
 
-    		$producto = Producto::findOrFail($id_prod);
-    		$unidades = UnidadMedida::all();
-            $ruta = route('EditarProducto', ['id' => $id, 'id_prod' => $id_prod]);
+            $resultados = null;
 
-    		return view('mpmp.formulario_producto', ['titulo' => 'Edición de Datos de Indicador de Producto', 'funcionario' => $this->funcionario, 'seccion' => $this->seccion, 'resultado_id' => $id, 'producto' => $producto, 'route' => $ruta, 'unidades' => $unidades]);
+            $proyectos = Auth::user()->funcionario->unidadGestion->proyectos->where('ejecutado', false);
+
+            foreach ($proyectos as $proyecto) {
+                
+                if ($resultados == null) {
+                    
+                    $resultados = $proyecto->resultados;
+
+                } else {
+
+                    $resultados = $proyecto->resultados->union($resultados);
+                }
+            }
+
+    		$unidades = UnidadMedida::all();
+
+            $ruta = route('EditarProducto', ['id' => $id]);
+
+            $datos = ['seccion' => self::SECCION, 'producto' => $producto, 'ruta' => $ruta, 'backroute' => $ruta, 'unidades' => $unidades, 'resultados' => $resultados, 'menu_list' => $mb->getMenu()];
+
+            if (!$request->session()->has('errors')) {
+                
+                toastr()->info(__('messages.required_fields'));
+
+            } else {
+
+                toastr()->error(__('messages.validation_error'), strtoupper(__('Validation Error')));
+
+            }
+
+    		return view('productos.editar', $datos);
 
     	}else if($request->isMethod('post')){
 
-    		if (!$request->has(['codigo_producto', 'descripcion'])){
+            $request->validate([
+                'codigo' => 'bail|alpha_dash|max:5|required',
+                'resultado_id' => 'integer|required',
+                'descripcion' => 'alpha_dash|max:600|required',
+                'formula' => 'alpha_dash|max:200|present|nullable',
+                'unidad_medida_id' => 'integer|nullable',
+            ]);
 
-    			return view('alert', ['titulo' => 'Existe inconsistencia de datos', 'seccion' => $this->seccion, 'mensaje' => 'Los campos codigo de producto y descripción son obligatorios.', 'funcionario' => $this->funcionario]);
-    			
-    		}else{
+            $producto->fill($request->input());
 
-    			$producto = Producto::findOrFail($id_prod);
+            try {
 
-    			$producto->codigo_producto = $request->codigo_producto;
-    			$producto->descripcion = $request->descripcion;
-    			$producto->formula = $request->formula;
-    			$producto->unidad_medida_id = $request->unidad_medida_id;
+                $producto->save();
+                
+            } catch (Exception $e) {
 
-    			$producto->save();
+                error_log("Excepción al actualizar Producto. ".$e->getMessage());
 
-    			return redirect()->route('IndiceProductos', ['id' => $id]);
+                toastr()->error(__('messages.critical_error'), strtoupper(__('Operation Error')));
 
-    		}
+                return redirect()->route('error');
+                
+            }
+
+            toastr()->success(__('messages.update_success'), strtoupper(__('Operation Success')));
+
+    		return redirect()->route('VerProducto', ['id' => $producto->id]);
 
     	}
     }
 
-    public function aprobar($id, $id_prod){
+    public function aprobar($id){
 
     	$producto = Producto::findOrFail($id_prod);
 
-    	$producto->aprobado = true;
-    	$producto->save();
+        try {
 
-    	return redirect()->route('IndiceProductos', ['id' => $id]);
+            $producto->aprobado = true;
+            $producto->save();
+            
+        } catch (Exception $e) {
+
+            error_log("Excepción al aprobar producto. ".$e->getMessage());
+
+            toastr()->error(__('messages.critical_error'), strtoupper(__('Operation Error')));
+
+            return redirect()->route('error');
+            
+        }
+
+    	return redirect()->route('VerProducto', ['id' => $producto->id]);
         
     }
 
-    public function eliminar(Request $request, $id, $id_prod){
+    public function eliminar(Request $request, $id){
 
-    	if ($request->isMethod('get')) {
-
-            $ruta = route('EliminarProducto', ['id' => $id, 'id_prod' => $id_prod]);
-
-    		return view('alert', ['titulo' => 'Eliminar Indicador de Producto', 'seccion' => $this->seccion, 'mensaje' => 'Se eliminará el registro de la base de datos', 'funcionario' => $this->funcionario, 'route' => $ruta]);
-            
-    	}else if ($request->isMethod('post')) {
+    	if ($request->isMethod('post')) {
     		
     		$producto = Producto::findOrFail($id_prod);
 
-    		$producto->delete();
+            try {
 
-    		return redirect()->route('IndiceProductos', ['id' => $id]);
+                $producto->delete();
+                
+            } catch (Exception $e) {
+
+                error_log("Excepción al eliminar producto. ".$e->getMessage());
+
+                toastr()->error(__('messages.critical_error'), strtoupper(__('Operation Error')));
+
+                return redirect()->route('error');
+                
+            }
+
+    		return redirect()->route('ListaProductos', ['page' => 1]);
     	}
+    }
+
+    public function ingresar_actividades(Request $request, MenuBuilder $mb, $id){
+
+        $producto = Producto::findOrFail($id);
+
+        $ruta = route('IngresarActividadesProducto', ['id' => $id]);
+
+        if ($request->isMethod('get')) {
+            
+            $empty_rows = config('variables.extra_rows', 4);
+
+            $datos = ['seccion' => self::SECCION, 'producto' => $producto, 'filas' => $empty_rows, 'ruta' => $ruta, 'backroute' => $ruta, 'menu_list' => $mb->getMenu()];
+
+            toastr()->info(__('messages.required_fields'));
+
+            return view('productos.actividades', $datos);
+
+        } else if ($request->isMethod('post')) {
+
+            if ($request->has('actividades')) {
+                
+                $datos = $request->actividades;
+                $filas = count($datos['codigo']);
+                $saved = 0;
+
+                for ($i=0; $i < $filas; $i++) { 
+                    
+                    if ((isset($datos['codigo'][$i]) && strlen($datos['codigo'][$i]) > 0) && (isset($datos['descripcion'][$i]) && strlen($datos['descripcion'][$i]) > 0)) {
+                        
+                        try {
+
+                            $actividad = Actividad::create([
+                                'producto_id' => $producto->id,
+                                'codigo' => $datos['codigo'][$i],
+                                'descripcion' => $datos['descripcion'][$i],
+                                'fuente_financiamiento' => $datos['fuente_financiamiento'][$i],
+                                'monto_presupuesto' => $datos['monto_presupuesto'][$i],
+                                'monto_aprobado' => $datos['monto_aprobado'][$i],
+                                'monto_disponible' => $datos['monto_disponible'][$i],
+                            ]);
+
+                            $saved++;
+                            
+                        } catch (Exception $e) {
+
+                            error_log("Excepción al registrar actividades del producto {$producto->codigo}. ".$e->getMessage());
+
+                            toastr()->error(strtoupper(__('messages.critical_error')), strtoupper(__('Operation Error')));
+
+                            return redirect()->route('error');
+                            
+                        }
+
+                    } else {
+
+                        break;
+
+                    }
+
+                }
+
+                if ($saved > 0) {
+                    
+                    toastr()->success("{$saved} ".__('messages.records_saved'), strtoupper(__('Operation Success')));
+
+                } else {
+
+                    toastr()->info(__('messages.no_records_saved'));
+
+                }
+
+                return redirect()->route('VerProducto', ['id' => $id]);
+
+
+            } else {
+
+                toastr()->error(__('messages.registration_error'), strtoupper(__('Operation Error')));
+
+
+                return redirect($ruta);
+
+            }
+        }
+
     }
 }

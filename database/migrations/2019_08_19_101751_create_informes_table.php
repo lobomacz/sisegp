@@ -19,17 +19,19 @@ class CreateInformesTable extends Migration
             $table->date('fecha_realizada');
             $table->string('dificultades', 1000);
             $table->string('soluciones', 1000);
+            $table->string('observaciones', 1000);
             $table->unsignedInteger('beneficiarios_directos');
             $table->unsignedInteger('beneficiarios_indirectos');
             $table->unsignedInteger('hombres');
             $table->unsignedInteger('mujeres');
             $table->unsignedInteger('ninos');
             $table->unsignedInteger('ninas');
-            $table->unsignedInteger('jovenes_m');
-            $table->unsignedInteger('jovenes_f');
-            $table->unsignedInteger('adulto_mayor_m');
-            $table->unsignedInteger('adulto_mayor_f');
-            $table->unsignedInteger('discapacitados');
+            $table->unsignedInteger('jovenes_m')->nullable();
+            $table->unsignedInteger('jovenes_f')->nullable();
+            $table->unsignedInteger('adulto_mayor_m')->nullable();
+            $table->unsignedInteger('adulto_mayor_f')->nullable();
+            $table->unsignedInteger('discapacitados')->nullable();
+            $table->boolean('anulado')->default(false);
             $table->timestamps();
 
             $table->foreign('actividad_id')->references('id')->on('actividades')->onDelete('cascade');

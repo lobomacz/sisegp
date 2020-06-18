@@ -25,7 +25,6 @@ class CreateActividadesTable extends Migration
             $table->boolean('aprobada')->default(false);
             $table->boolean('ejecutada')->default(false);
             $table->boolean('cancelada')->default(false); //Al cierre del período, si no está aprobada, será cancelada la actividad.
-            $table->boolean('informe')->default(false);
             $table->timestamps();
         });
     }

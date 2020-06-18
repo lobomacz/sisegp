@@ -36,9 +36,15 @@ class UnidadGestion extends Model
         return !($this->programas() == null && $this->proyectos() == null);
     }
 
+    public function periodos(){
+        return $this->hasMany('App\Models\PeriodoUnidad');
+    }
+
+    /*
     public function planes(){
         return $this->hasMany('App\Models\Plan');
     }
+    */
 
     public function solicitudes(){
         return $this->hasMany('App\Models\Solicitud');

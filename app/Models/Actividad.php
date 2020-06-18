@@ -9,6 +9,8 @@ class Actividad extends Model
 
     protected $table = 'actividades';
 
+    protected $guarded = ['id','aprobada','cancelada','ejecutada'];
+
     public function producto(){
     	return $this->belongsTo('App\Models\Producto');
     }

@@ -3,60 +3,178 @@
 namespace App\Http\Controllers\MPMP;
 
 use Illuminate\Http\Request;
+use App\Libreria\MenuBuilder;
 use App\Http\Controllers\Controller;
 use App\Models\Plan;
 use App\Models\Periodo;
-use App\Models\ServicioPersonal;
+use App\Models\PeriodoUnidad;
+use App\Models\Personal;
 use App\Models\Documento;
+use App\Models\Actividad;
+use Auth;
 
 class PlanController extends Controller
 {
-    //
-    protected $funcionario = Auth::user()->funcionario;
+    
+    const SECCION = 'plans';
 
-    protected $seccion = 'Planes';
+    public function lista_planes(MenuBuilder $mb, $page=1, $todos=null){
 
-    public function lista_planes($tipo, $per = null){
+        $ruta = route('ListaPlanes', ['page' => $page, 'todos' => $todos]);
 
-    	$periodo = $per;
+        $periodos = null;
 
-    	if ($periodo === null) {
+        $limite = config('variables.limite_lista', 20)/4;
+
+    	$funcionario = Auth::user()->funcionario;
+
+        $digitador = $funcionario->tieneRol('digitador') || $funcionario->tieneRol('digitador-adq');
+
+    	if ($todos == null) {
+
+            //$periodo = PeriodoUnidad::where([['activo', true], ['unidad_gestion_id', $funcionario->unidadGestion->id], ['abierto', true]])->get();
     		
-    		$periodo = Periodo::all()->max('id');
+            if ($digitador == true) {
+                
+                $periodos = PeriodoUnidad::where([['unidad_gestion_id', $funcionario->unidadGestion->id],['abierto', true]]);//$funcionario->unidadGestion->planes->where('periodo_id', $periodo->id);
 
-    		if ($periodo === null) {
-    			
-    			return redirect()->route('error');
-    		}
+            }else {
 
-    	}
+                $periodos = PeriodoUnidad::where('abierto', true);
 
-    	$planes = $periodo->planes()->where('tipo_plan', $tipo)->get();
+            }
+    		
+    	} elseif (strtolower($todos) == 'all') {
+            
+            if ($digitador == true) {
+                
+                $periodos = PeriodoUnidad::where('unidad_gestion_id', $funcionario->unidadGestion->id);//$funcionario->unidadGestion->planes;
 
-    	return view('mpmp.lista_planes', ['titulo' => 'Lista de Planes del Período', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'planes' => $planes, 'periodo' => $periodo]);
+            }else {
+
+                $periodos = PeriodoUnidad::all();
+
+            }
+
+        }
+
+        if ($periodos->count() > $limite) {
+            
+            $periodos = $periodos->paginate($limite);
+
+        }
+
+    	
+    	return view('mpmp.lista_planes', ['seccion' => self::SECCION, 'periodos' => $periodos, 'page' => $page, 'backroute' => $ruta, 'menu_list' => $mb->getMenu()]);
 
     }
 
-    public function nuevo(Request $request, $per=null){
+    public function lista_planes_periodo(MenuBuilder $mb, $pid, $page=1){
+
+        $ruta = route('ListaPlanesPeriodo', ['page' => $page, 'todos' => $todos, 'pid' => $pid]);
+
+        $periodos = null;
+
+        //$planes = null;
+
+        $limite = config('variables.limite_lista', 20)/4;
+
+        $funcionario = Auth::user()->funcionario;
+
+        $digitador = $funcionario->tieneRol('digitador') || $funcionario->tieneRol('digitador-adq');
+
+        if ($digitador == true) {
+                
+            $periodos =  PeriodoUnidad::where([['periodo_id', $pid], ['unidad_gestion_id', $funcionario->unidadGestion->id]]);//$funcionario->unidadGestion->planes->where([['periodo_id', '=', $periodo->id], ['tipo', '=', $tipo],]);
+
+        }else {
+
+            $periodos = PeriodoUnidad::where('periodo_id', $pid) //Plan::where([['periodo_id', '=', $periodo->id], ['tipo', '=', $tipo],]);
+
+        }
+
+        /*
+        if ($todos == null) {
+
+            $periodo = Periodo::where('activo', true)->get();
+            
+            if ($digitador == true) {
+                
+                $planes = $funcionario->unidadGestion->planes->where([['periodo_id', '=', $periodo->id], ['tipo', '=', $tipo],]);
+
+            }else {
+
+                $planes = Plan::where([['periodo_id', '=', $periodo->id], ['tipo', '=', $tipo],]);
+
+            }
+            
+        } elseif (strtolower($todos) == 'all') {
+            
+            if ($digitador == true) {
+                
+                $planes = $funcionario->unidadGestion->planes->where('tipo', '=', $tipo);
+
+            }else {
+
+                $planes = Plan::where('tipo', '=', $tipo);
+
+            }
+
+        }
+        */
+
+        if ($periodos->count() > $limite) {
+            
+            $periodos = $periodos->paginate($limite);
+
+        }
+
+        
+        return view('mpmp.lista_planes', ['seccion' => self::SECCION, 'periodos' => $periodos, 'page' => $page, 'backroute' => $ruta, 'menu_list' => $mb->getMenu()]);
+
+    }
+
+    public function nuevo(Request $request, MenuBuilder $mb){
 
     	if($request->isMethod('get')){
 
-    		$periodo = Periodo::where('activo', true);
+            $funcionario = Auth::user()->funcionario;
+
+            $unidad_gestion = $funcionario->unidadGestion;
+
+            $periodo = PeriodoUnidad::where([['activo', true], ['unidad_gestion_id', $unidad_gestion->id]]);
 
     		$plan = new Plan;
 
-    		$ruta = route('NuevoPlan', ['per' => $periodo->id]);
+    		$ruta = route('NuevoPlan');
 
-    		return view('mpmp.formulario_plan', ['titulo' => 'Ingreso de Planes', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'periodo' => $periodo, 'plan' => $plan, 'route' => $ruta]);
+            $datos = ['seccion' => self::SECCION, 'plan' => $plan, 'ruta' => $ruta, 'backroute' => $ruta, 'menu_list' => $mb->getMenu(), 'unidad_gestion' => $unidad_gestion, 'periodo' => $periodo];
+
+            if (!$request->session()->has('errors')) {
+                
+                toastr()->info(__('messages.required_fields'));
+
+            } else {
+
+                toastr()->error(__('messages.validation_error'), strtoupper(__('Validation Error')));
+
+            }
+
+    		return view('mpmp.nuevo_plan', $datos);
 
     	}else if ($request->isMethod('post')) {
 
-    		if(!$request->has(['fecha_inicio', 'fecha_final'])){
+    		$request->validate([
+                'periodo_unidad_id' => 'bail|numeric|required',
+                'fecha_inicio' => 'date|required',
+                'fecha_final' => 'date|required',
+                'trimestre' => 'numeric|required',
+                'monto_aprobado' => 'numeric|nullable',
+            ]);
 
-    			return redirect()->route('error');
+            $plan = Plan::create($request->input());
 
-    		}
-
+            /*
     		$unidad_gestion = $this->funcionario->unidadGestion;
     		
     		$periodo = Periodo::find($per);
@@ -69,44 +187,88 @@ class PlanController extends Controller
     		$plan->trimestre = $request->trimestre;
 
     		$unidad_gestion->planes()->save($plan);
+            */
 
-    		return redirect()->route('IndicePlanes');
+            toastr()->success(__('messages.registration_success'), strtoupper(__('Operation Success')));
+
+    		return redirect()->route('VerPlan', ['id' => $plan->id]);
 
     	}
     }
 
-    public function ver($id){
+    public function ver(MenuBuilder $mb, $id){
 
     	$plan = Plan::findOrFail($id);
 
-    	return view('mpmp.detalle_plan', ['titulo' => 'Detalle de Plan', 'funcionario' => $this->funcionario, 'seccion' => $this->seccion, 'plan' => $plan]);
+        $params = ['id' => $id];
+
+        $ruta = route('VerPlan', $params);
+
+        $ruta_edit = route('EditarPlan', $params);
+
+        $ruta_delete = route('EliminarPlan', $params);
+
+        $ruta_approve = route('AprobarPlan', $params);
+
+        $ruta_activate = route('ActivarPlan', $params);
+
+        $ruta_close = route('CerrarPlan', $params);
+
+        $datos = ['seccion' => self::SECCION, 'plan' => $plan, 'menu_list' => $mb->getMenu(), 'backroute' => $ruta, 'ruta_edit' => $ruta_edit, 'ruta_delete' => $ruta_delete, 'ruta_approve' => $ruta_approve, 'ruta_activate' => $ruta_activate, 'ruta_close' => $ruta_close];
+
+    	return view('mpmp.detalle_plan', $datos);
+
     }
 
-    public function editar(Request $request, $id){
+    public function editar(Request $request, MenuBuilder $mb, $id){
 
     	$plan = Plan::findOrFail($id);
 
-    	if (!($plan->aprobado || $plan->cerrado)) {
+    	if (!($plan->cerrado == true)) {
 
     		if ($request->isMethod('get')) {
 
 	    		$ruta = route('EditarPlan', ['id' => $id]);
 
-	    		return view('mpmp.formulario_plan', ['titulo' => 'Modificar Plan', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'plan' => $plan, 'route' => $ruta]);
+                $datos = ['plan' => $plan, 'seccion' => self::SECCION, 'ruta' => $ruta, 'backroute' => $ruta, 'menu_list' => $mb->getMenu()];
+
+                if (!$request->session()->has('errors')) {
+                    
+                    toastr()->info(__('messages.required_fields'));
+                } else {
+
+                    toastr()->error(__('messages.validation_error'), strtoupper(__('Validation Error')));
+
+                }
+                
+
+	    		return view('mpmp.editar_plan', $datos);
+
 	    	}else if ($request->isMethod('post')) {
 
-	    		$plan->tipo_plan = $request->tipo_plan;
-	    		$plan->fecha_inicio = $request->fecha_inicio;
-	    		$plan->fecha_final = $request->fecha_final;
-	    		$plan->trimestre = $request->trimestre;
+	    		$request->validate([
+                    'periodo_unidad_id' => 'bail|numeric|required',
+                    'fecha_inicio' => 'date|required',
+                    'fecha_final' => 'date|required',
+                    'trimestre' => 'numeric|nullable',
+                    'monto_aprobado' => 'numeric|nullable',
+                ]);
+
+                $plan->fill($request->input());
 
 	    		$plan->save();
 
-	    		return redirect()->route('IndicePlanes');
+                toastr()->success(__('messages.update_success'), strtoupper(__('Operation Success')));
+
+	    		return redirect()->route('VerPlan', ['id' => $id]);
 
 	    	}
     	}else {
-    		return redirect()->route('error');
+
+            toastr()->error(__('messages.edit_approved_record', strtoupper(__('unauthorized operation'))));
+
+    		return redirect()->route('VerPlan', ['id' => $id]);
+
     	}
 
     	
@@ -114,19 +276,22 @@ class PlanController extends Controller
 
     public function eliminar(Request $request, $id){
 
-    	if ($request->isMethod('get')) {
-    		
-    		$ruta = route('EliminarPlan', ['id' => $id]);
-
-    		return view('alert', ['titulo' => 'Eliminar Plan', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'mensaje' => 'Se eliminará el plan de la base de datos.', 'route' => $ruta]);
-
-    	}else if ($request->isMethod('post')) {
+    	if ($request->isMethod('post')) {
     		
     		$plan = Plan::findOrFail($id);
 
+            if ($plan->aprobado == true) {
+                
+                toastr()->error(__('messages.delete_approved_record'), strtoupper(__('unauthorized operation')));
+                return redirect()->route('VerPlan', ['id' => $id]);
+
+            }
+
     		$plan->delete();
 
-    		return redirect()->route('IndicePlanes');
+            toastr()->success(__('messages.record_deleted'));
+
+    		return redirect()->route('ListaPlanes');
     	}
     }
 
@@ -136,168 +301,365 @@ class PlanController extends Controller
 
     	$plan->aprobado = true;
 
+        $plan->cerrado = true;
+
     	$plan->save();
 
-    	return redirect()->route('IndicePlanes');
+        toastr()->success(__('messages.update_success'), strtoupper(__('Operation Success')));
+
+    	return redirect()->route('VerPlan', ['id' => $id]);
+    }
+
+    public function abrir($id){
+
+        $plan = Plan::findOrFail($id);
+
+        $plan->cerrado = false;
+
+        $plan->save();
+
+        toastr()->success(__('messages.update_success'), strtoupper(__('Operation Success')));
+
+        return redirect()->route('VerPlan', ['id' => $id]);
     }
 
     public function activar($id){
 
     	$plan = Plan::findOrFail($id);
 
+        $periodo = $plan->periodo;
+
+        //$tipo = $plan->tipo;
+
+        //$unidad_gestion = $plan->unidadGestion;
+
+        $activo = $periodo->planes->where('activo', true); //Plan::where([['unidad_gestion_id',$unidad_gestion],['tipo',$tipo],['activo',true]]);
+
+        if(isset($activo) && $activo->id != null){
+
+            toastr()->error(__('messages.unable_to_activate'));
+            toastr()->info(__('messages.deactivate_plan'));
+
+            return redirect()->route('VerPlan', ['id' => $activo->id]);
+
+        }
+
     	$plan->activo = true;
 
     	$plan->save();
 
-    	return redirect()->route('IndicePlanes');
+    	toastr()->success(__('messages.update_success'), strtoupper(__('Operation Success')));
+
+        return redirect()->route('VerPlan', ['id' => $id]);
+
     }
 
-    public function resultados(Request $request, $id){
+    public function cerrar($id){
+
+        $plan = Plan::findOrFail($id);
+
+        //$balance = $plan->resultados[0]->pivot->balance;
+
+        $productos = $plan->productos;
+
+        $pendientes = 0;
+
+        foreach ($productos as $producto) {
+            if($producto->pivot->logros == null){
+                $pendientes++;
+            }
+        }
+
+        //$dificultades = $plan->productos[0]->pivot->dificultades;
+
+        if($pendientes > 0){
+
+            toastr()->warning(__('messages.no_plan_report'));
+
+            return redirect()->route('VerPlan', ['id' => $id]);
+
+        }
+
+        $plan->activo = false;
+
+        //$plan->cerrado = true;
+
+        $plan->save();
+
+        toastr()->success(__('messages.update_success'), strtoupper(__('Operation Success')));
+
+        return redirect()->route('VerPlan', ['id' => $id]);
+
+    }
+
+    public function informe(Request $request, MenuBuilder $mb, $id){
+        
+        $plan = Plan::withCount('actividades')->get($id);
+
+        if ($request->isMethod('get')) {
+            
+            if ($plan->activo == true) {
+                
+                $ruta = route('InformePlan', ['id' => $id]);
+
+                $total_actividades = $plan->actividades_count;
+
+                $ejecutadas = 0;
+
+                foreach ($plan->actividades as $actividad) {
+                    
+                    if ($actividad->ejecutada == true) {
+                        
+                        $ejecutadas++;
+
+                    }
+
+                }
+
+                $pendientes = $total_actividades - $ejecutadas;
+
+                $datos = ['plan' => $plan, 'actividades' => $total_actividades, 'ejecutadas' => $ejecutadas, 'pendientes' => $pendientes, 'ruta' => $ruta, 'backroute' => $ruta, 'menu_list' => $mb->getMenu(), 'seccion' => self::SECCION];
+
+                if (!$request->session()->has('errors')) {
+                    
+                    toastr()->info(__('messages.required_fields'));
+
+                }else{
+
+                    toastr()->error(__('messages.validation_error'), strtoupper(__('Validation Error')));
+
+                }
+
+                return view('mpmp.informe_plan', $datos);
+
+            }
+
+
+        } elseif ($request->isMethod('post')) {
+
+            if ($request->has('productos')) {
+                
+                //$datos_resultados = $request->datos_resultados;
+
+                $productos = $request->productos;
+
+                //$filas_resultados = count($datos_resultados['resultado_id']);
+
+                $filas_productos = count($productos['producto_id']);
+
+                //$resultados_saved = 0;
+
+                $productos_saved = 0;
+
+                /*
+                for ($i=0; $i < $filas_resultados; $i++) { 
+
+                    if (isset($datos_resultados['balance'][$i])) {
+                        
+                        $plan->resultados()->updateExistingPivot($datos_resultados['resultado_id'][$i],[
+                            'balance' => $datos_resultados['balance'][$i]
+                        ]);
+
+                        $resultados_saved++;
+
+                    }else{
+
+                        break;
+
+                    }
+
+                }
+                */
+
+                for ($i=0; $i < $filas_productos; $i++) { 
+                    
+                    if (isset($productos['logros'][$i]) && isset($productos['dificultades'][$i])) {
+                        
+                        $plan->productos()->updateExistingPivot($productos['producto_id'][$i], [
+                            'logros' => $productos['logros'][$i],
+                            'situacion_resultado' => $productos['situacion_resultado'][$i],
+                            'dificultades' => $productos['dificultades'][$i],
+                            'soluciones' => $productos['soluciones'][$i],
+                        ]);
+
+                        $productos_saved++;
+
+                    } else {
+
+                        break;
+
+                    }
+                }
+
+                //Si se envía un documento de informe
+                //se procede a guardarlo y ligar la referencia
+
+                if ($request->hasFile('documento') && $request->file('documento')->isValid()) {
+
+                    try {
+
+                        $documento_id = null;
+
+                        $dir_destino = "docs";
+
+                        $nombre = basename($request->documento->path());
+
+                        $extension = $request->documento->extension();
+
+                        $path = $request->documento->store($dir_destino);
+
+                        $documento = new Documento;
+
+                        $documento->descripcion = "Informe de plan {$plan->id}";
+
+                        $documento->tipo_documento = $extension ?:"pdf";
+
+                        $documento->url = $path;
+
+                        $documento->nombre = $nombre;
+
+                        $documento->save();
+
+                        $plan->documentos()->attach($documento);
+                        
+                    } catch (Exception $e) {
+
+                        $ruta = route('VerPlan', ['id' => $id]);
+                        
+                        $mensaje = "Ocurrió un problema al guardar el informe. ".$e->getMessage();
+
+                        return view('error', ['titulo' => 'Error Crítico!', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'mensaje' => $mensaje, 'route' => ]);
+                    }
+
+
+
+                toastr()->success(__('messages.update_success'), strtoupper(__('Operation Success')));
+                toastr()->info("{$productos_saved} ".__('messages.records_updated'));
+
+                return redirect()->route('VerPlan', ['id' => $id]);
+
+            }
+            
+        }
+    }
+
+
+    public function productos(Request $request, MenuBuilder $mb, $id){
 
     	$plan = Plan::findOrFail($id);
 
-    	$no_mod = $this->checkPlan($plan);
+    	//$no_mod = $this->checkPlan($plan);
 
-    	if ($no_mod != null) {
-    		return $no_mod;
+    	if ($plan->aprobado && $plan->cerrado) {
+    		//return $no_mod;
+            toastr()->info(__('messages.edit_approved_record'));
+            toastr()->warning(__('messages.unauthorized_operation'));
+
+            return redirect()->route('VerPlan', ['id' => $id]);
     	}
 
-    	if ($request->isMethod('get')) {
-
-    		$unidad_gestion = $this->funcionario->unidadGestion->get();
-
-    		///TODO:
-    		// Refinar la selección de resultados para que no se repitan los resultados 
-    		// que ya fueron asociados al plan
-    		
-    		$resultados = $plan->resultados;
-    		$resultados_proyectos = $unidad_gestion->proyectos()->where('ejecutado', false)->resultados;
-    		$resultados_programas = $unidad_gestion->programas()->where('finalizado', false)->proyectos()->where('ejecutado', false)->resultados;
-
-    		return view('mpmp.plan_resultados', ['titulo' => 'Resultados del Plan', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'plan' => $plan, 'resultados' => $resultados, 'por_proyecto' => $resultados_proyectos, 'por_programa' => $resultados_programas]);
-
-
-    	}elseif ($request->isMethod('post')) {
-    		
-    		if ($request->has('datos_res')) {
-    			
-    			
-    				
-				$datos_res = $request->input('datos_res', null);
-
-    			//Función que recibe cada formulario con datos de post y asocia el resultado al plan
-    			$registrar = function($resultado_id, $agregar=false){
-
-    				$resultado = $plan->resultados()->find($resultado_id);
-
-    				if ($resultado != null && !$agregar) {
-
-    					$plan->resultados()->dettach($resultado_id);
-
-    				}else if($resultado == null && $agregar){
-
-    					$plan->resultados()->attach($resultado_id);
-
-    				}
-    				
-    				
-    			};
-
-    			if ($datos_res != null) {
-    				
-    				array_map($registrar, $datos_res['resultado_id'], $datos_res['agregar']);
-
-    				return redirect()->route('VerPlan', ['id' => $id]);
-
-    			}else{
-
-    				return redirect()->route('error');
-
-    			}
-
-    		}else{
-
-    			return redirect()->route('error');
-
-    		}
-
-    	}
-    }
-
-    public function productos(Request $request, $id){
-
-    	$plan = Plan::findOrFail($id);
-
-    	$no_mod = $this->checkPlan($plan);
-
-    	if ($no_mod != null) {
-    		return $no_mod;
-    	}
+        $ruta = route('PlanProductos', ['id' => $id]);
 
 		if ($request->isMethod('get')) {
 
+            /*
 			if ($plan->resultados != null) {
 				
 				$ruta = route('VerPlan', ['id' => $id]);
 
 				return view('alert', ['titulo' => 'Sin Indicadores de Resultado', 'funcionario' => $this->funcionario, 'seccion' => $this->seccion, 'mensaje' => 'El plan no posee indicadores de resultado asignados. Revise y vuelva a intentarlo.' => $ruta]);
 
-			}
+			}*/
 			
-			$resultados = $plan->resultados;
+			$resultados = $plan->periodo->resultados;
 
-			$productos = $plan->productos;
+			$productos = collect([]); //$plan->productos;
 
-			$ruta = route('PlanProductos', ['id' => $id]);
+            foreach ($resultados as $resultado) {
+                
+                $productos = $productos->union($resultado->productos->where('finalizado', false)->get());
+            }
 
-			return view('mpmp.plan_productos', ['titulo' => 'Productos Por Resultado para el Plan', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'plan' => $plan, 'resultados' => $resultados, 'route' => $ruta]);
+            $datos = ['seccion' => self::SECCION, 'plan' => $plan, 'resultados' => $resultados, 'productos' => $productos, 'ruta' => $ruta, 'backroute' => $ruta, 'menu_list' => $mb->getMenu()];
 
-		}elseif ($request->isMethod('post')) {
-			
-			if($request->has('datos_prod')){
+            if (!$request->session()->has('errors')) {
+                
+                toastr()->info(__('messages.required_fields'));
 
-				$datos_prod = $request->input('datos_prod');
+            } else {
 
-				$registrar = function($producto_id, $meta, $situacion, $agregar=false){
+                toastr()->error(__('messages.validation_error'), strtoupper(__('Validation Error')));
 
-					$producto = $plan->productos()->find($producto_id);
+            }
 
-					if ($producto != null && !agregar) {
+			return view('mpmp.plan_productos', $datos);
 
-						$plan->productos()->dettach($producto_id);
+		} else if ($request->isMethod('post')) {
 
-					}else if($producto == null && $agregar){
+            $request->validate([
+                'producto_id' => 'bail|numeric|required',
+                'meta' => 'numeric|required',
+                'consolidado_anual' => 'string|required',
+                'situacion_inicial' => 'alpha_num|max:500|present',
+            ]);
 
-						$plan->productos()->attach($producto_id, ['meta' => $meta, 'situacion_inicial' => $situacion]);
+            $producto = $request->all();
 
-					}
+            $edit = $plan->productos->where('producto_id', $producto['producto_id'])->get();
 
-					
-				};
+            if ($edit->count() > 0) {
 
-				if ($datos_prod != null) {
-					
-					array_map($registrar, $datos_prod['producto_id'], $datos_prod['meta'], $datos_prod['situacion'], $datos_prod['agregar']);
+                $plan->productos()->updateExistingPivot($producto['producto_id'], [
+                    'meta' => $producto['meta'],
+                    'consolidado_anual' => $producto['consolidado_anual'],
+                    'situacion_inicial' => $producto['situacion_inicial'],
+                ]);
 
-					return redirect('VerPlan', ['id' => $id]);
+            } else {
 
-				}else{
+                $plan->productos()->attach($producto['producto_id'], [
+                    'meta' => $producto['meta'],
+                    'consolidado_anual' => $producto['consolidado_anual'],
+                    'situacion_inicial' => $producto['situacion_inicial'],
+                ]);
 
-    				return redirect()->route('error');
+            }
 
-    			}
+            toastr()->success(__($edit->count() > 0 ? 'messages.update_success':'messages.registration_success'));
 
-			}else{
 
-				return redirect()->route('error');
-			}
+            return redirect()->route('PlanProductos', ['id' => $id]);
+
 		}
-
-    	
     	
     }
 
-    public function actividades(Request $request, $id){
+
+    public function remover_producto($id, $pid){
+
+        $plan = Plan::findOrFail($id);
+
+        $ruta = route('PlanProductos', ['id' => $id]);
+
+        if($plan->cerrado == true){
+
+            toastr()->warning(__('messages.edit_closed'), strtoupper(__('unauthorized operation')));
+
+            return redirect($ruta);
+
+        }
+
+        $plan->productos()->detach($pid);
+
+        toastr()->success(__('messages.record_removed'), strtoupper(__('Operation Success')));
+
+        return redirect($ruta);
+
+    }
+
+
+
+    public function actividades(Request $request, MenuBuilder $mb, $id){
 
     	$plan = Plan::findOrFail($id);
 
@@ -305,108 +667,163 @@ class PlanController extends Controller
         // La etapa de modificación del plan es mientras no ha sido aprobado 
         // o no se haya cerrado.
 
-    	$no_mod = $this->checkPlan($plan); 
+    	if($plan->cerrado == true){
 
-    	if ($no_mod != null) {
-    		return $no_mod;
-    	}
+            toastr()->warning(__('messages.edit_closed'), strtoupper(__('unauthorized operation')));
+
+            return redirect()->route('VerPlan', ['id' => $id]);
+
+        }
+
+        $ruta = route('PlanActividades', ['id' => $id]);
 
 		if ($request->isMethod('get')) {
 			
-			if ($plan->productos != null) {
+			if ($plan->productos->count() == 0) {
+
+                toastr()->info(__('messages.no_product_registered'));
+
+                return redirect()route('VerPlan', ['id' => $id]);
 				
-				$ruta = route('VerPlan', ['id' => $id]);
-
-				return view('alert', ['titulo' => 'Sin Indicadores de Producto', 'funcionario' => $this->funcionario, 'seccion' => $this->seccion, 'mensaje' => 'El plan no posee indicadores de producto asignados. Revise y vuelva a intentarlo.' => $ruta]);
-
 			}
 
 			$productos = $plan->productos;
 
-			$actividades = $plan->actividades;
+			$actividades = collect([]);
 
-			$ruta = route('PlanActividades', ['id' => $id]);
+            foreach ($productos as $producto) {
+                
+                $actividades = $actividades->union($producto->actividades->where([['ejecutada', false], ['aprobada', true], ['cancelada', false]]));
+            }
 
-			return view('mpmp.plan_actividades', ['titulo' => 'Selección de Actividades del Plan', 'funcionario' => $this->funcionario, 'seccion' => $this->seccion, 'producto' => $producto, 'actividades' => $actividades, 'route' => $ruta]);
+            if ($request->session()->has('errors')) {
+                
+                toastr()->error(__('messages.validation_error'), strtoupper(__('Validation Error')));
+
+            } else {
+
+                toastr()->info(__('messages.required_fields'));
+
+            }
+
+			return view('mpmp.plan_actividades', ['seccion' => self::SECCION, 'productos' => $productos, 'actividades' => $actividades, 'route' => $ruta, 'backroute' => $ruta, 'menu_list' => $mb->getMenu()]);
 
 
 		}else if ($request->isMethod('post')) {
 			
 
-    		if(!$request->has('datos_act')){
+    		$request->validate([
+                'actividad_id' => 'bail|numeric|required',
+                'fecha_programada' => 'date|required',
+            ]);
 
-    			$ruta = route('VerPlan', ['id' => $id]);
+            $datos = $request->all();
 
-				return view('alert', ['titulo' => 'Sin Datos de Actividades', 'funcionario' => $this->funcionario, 'seccion' => $this->seccion, 'mensaje' => 'No se encontraron datos de actividades seleccionadas. Por favor, vuelva a intentarlo.', 'route' => $ruta]);
+            $edit = $plan->actividades->get($datos['actividad_id'])->count();
 
-    		}else{
+            if ($edit > 0) {
+                
+                $plan->actividades()->updateExistingPivot($datos['actividad_id'], ['fecha_programada' => $datos['fecha_programada']]);
 
-    			$productos = $plan->productos;
+            } else {
 
-    			$datos_act = $request->input('datos_act');
+                $plan->actividades()->attach($datos['actividad_id'], ['fecha_programada' => $datos['fecha_programada']]);
 
-    			$registrar = function($actividad_id, $agregar=false){
+            }
 
-    				$actividad = $plan->actividades()->find($actividad_id);
+            toastr()->success(__($edit > 0 ? 'messages.update_success':'messages.registration_success'), strtoupper(__('Operation Success')));
 
-    				if ($actividad != null && !agregar) {
-    					
-    					$plan->actividades()->dettach($actividad_id);
-
-    				}else if($actividad == null && agregar){
-
-    					$plan->actividades()->attach($actividad_id);
-
-    				}
-
-    			};
-
-    			if ($datos_act != null) {
-    				
-    				array_map($registrar, $datos_act['actividad_id'], $datos_act['agregar']);
-
-    				return redirect()->route('VerPlan');
-
-    			}else{
-
-    				return redirect()->route('error');
-
-    			}
-
-    		}
+            return redirect($ruta);
 	    	
 		}
     	
     }
 
-    public function servicios_personales(Request $request, $id){
+    public function remover_actividad($id, $aid){
+
+        $plan = Plan::findOrFail($id);
+
+        $actividad = $plan->actividades->get($aid);
+
+        if ($actividad->pivot->ejecutada != true) {
+            
+            $plan->actividades()->detach($aid);
+
+        } else {
+
+            toastr()->warning(__('messages.remove_executed_activity'), strtoupper(__('unauthorized operation')));
+
+        }
+
+        toastr()->success(__('messages.record_removed'), strtoupper(__('Operation Success')));
+
+        return redirect()->route('VerPlan', ['id' => $id]);
+
+    }
+
+
+    public function servicios_personales(Request $request, MenuBuilder $mb, $id){
 
     	$plan = Plan::findOrFail($id);
 
-    	$no_mod = $this->checkPlan($plan);
+    	if($plan->cerrado == true){
 
-    	if ($no_mod != null) {
+            toastr()->warning(__('messages.edit_closed'), strtoupper(__('unauthorized operation')));
 
-    		return $no_mod;
+            return redirect()->route('VerPlan', ['id' => $id]);
 
-    	}
+        }
 
-    	if ($plan->tipo_plan !== 'anual') {
-
-    		return redirect()->route('error');
-
-    	}
+        $ruta = route('PlanServiciosPersonales', ['id' => $id]);
 
     	if ($request->isMethod('get')) {
     		
-    		$servicios = $plan->serviciosPersonales;
+    		$personal = $plan->personal;
 
-    		$ruta = route('PlanServiciosPersonales', ['id' => $id]);
+    		
 
-    		return view('mpmp.formulario_servicios_personales', ['titulo' => 'Servicios Personales', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'plan' => $plan, 'servicios' => $servicios, 'route' => $ruta]);
+            if ($request->session()->has('errors')) {
+                
+                toastr()->warning(__('messages.validation_error'), strtoupper(__('Validation Error')));
+
+            } else {
+
+                toastr()->info(__('messages.required_fields'));
+
+            }
+
+    		return view('mpmp.servicios_personales', ['seccion' => self::SECCION, 'plan' => $plan, 'personal' => $personal, 'ruta' => $ruta, 'backroute' => $ruta, 'menu_list' => $mb->getMenu()]);
 
     	}elseif ($request->isMethod('post')) {
-    		
+
+            $request->validate([
+                'personal_id' => 'bail|integer|required',
+                'personas' => 'integer|required',
+                'salario' => 'numeric|required'
+            ]);
+
+            $personal = $request->all();
+
+            $count = $plan->personal->where('personal_id', $personal['personal_id'])->count();
+
+            if ($count > 0) {
+                
+                $plan->personal()->updateExistingPivot($personal['personal_id'], ['personas' => $personal['personas'], 'salario' => $personal['salario']]);
+
+            } else {
+
+                $plan->personal()->attach($personal['personal_id'], ['personas' => $personal['personas'], 'salario' => $personal['salario']]);
+
+            }
+
+            
+            toastr()->success(__($count > 0 ? 'messages.update_success':'messages.registration_success'), strtoupper(__('Operation Success')));
+
+            return redirect($ruta);
+
+
+            // BLOQUE A ELIMINAR
+    		/*
     		if ($request->has('datos_servicios')) {
     			
     			$datos = $request->input('datos_servicios');
@@ -462,10 +879,14 @@ class PlanController extends Controller
     			return view('alert', ['titulo' => 'Sin datos de servicios', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'mensaje' => 'No se encontraron datos de servicios. Regrese y vuelva a intentarlo.']);
 
     		}
+            */
+            //FIN BLOQUE A ELIMINAR
+
     	}
 
     }
 
+    /*
     public function informe(Request $request, $id){
 
         $plan = Plan::findOrFail($id);
@@ -575,6 +996,7 @@ class PlanController extends Controller
 
         }
     }
+    
 
     private function checkPlan($plan){
 
@@ -586,4 +1008,6 @@ class PlanController extends Controller
     	}
 
     }
+    */
+
 }

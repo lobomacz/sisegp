@@ -3,20 +3,26 @@
 namespace App\Http\Controllers\MPMP;
 
 use Illuminate\Http\Request;
+use App\Libreria\MenuBuilder;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 use App\Models\Actividad;
 use App\Models\Producto;
 use App\Models\Insumo;
 use App\Models\UnidadMedida;
+use App\Models\Documento;
+use App\Models\Foto;
+use App\Models\Solicitud;
 use Auth;
 
 class ActividadController extends Controller
 {
-    //
-    protected $funcionario = Auth::user()->funcionario;
+    
+    const SECCION = 'activities';
 
-    protected $seccion = "Actividades";
+    /*
 
-    public function index($id){
+    public function index($page=1, $todas=null){
 
     	$producto = Producto::findOrFail($id);
 
@@ -25,259 +31,596 @@ class ActividadController extends Controller
     	return view('mpmp.indice_actividades', ['titulo' => 'Actividades del producto', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'producto' => $producto, 'actividades' => $actividades]);
 
     }
+    */
 
-    public function gestion(Request $request){
-        
+    public function lista(MenuBuilder $mb, $page=1){
+
+        $funcionario = Auth::user()->funcionario;
+
+        $limite = config('variables.limite_lista', 20);
+
+        $ruta = route('ListaActividades', ['page' => $page, 'todos' => $todos]);
+
+        $unidad = $funcionario->unidadGestion;
+
+        $actividades = $unidad->proyectos->where('ejecutado', false)->resultados->productos->actividades->paginate($limite);
+
+        $datos = ['seccion' => self::SECCION, 'actividades' => $actividades, 'backroute' => $ruta, 'menu_list' => $mb->getMenu(), 'page' => $page, 'unidad_gestion' => $unidad];
+
+        return view('actividades.lista', $datos);
+
     }
 
-    public function nuevo(Request $request, $id){
-
-    	$producto = Producto::findOrFail($id);
+    
+    public function nuevo(Request $request, MenuBuilder $mb){
+    	
 
     	if($request->isMethod('get')){
+
+            $productos = Auth::user()->funcionario->unidadGestion->proyectos->where('ejecutado', false)->resultados->productos;
 
     		$actividad = new Actividad;
 
-    		return view('mpmp.formulario_actividad', ['titulo' => 'Nueva Actividad del producto', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'producto' => $producto, 'actividad' => $actividad]);
+            $ruta = route('NuevaActividad');
+
+            if (!$request->session()->has('errors')) {
+                
+                toastr()->info(__('messages.required_fields'));
+
+            } else {
+
+                toastr()->error(__('messages.validation_error'), strtoupper(__('Validation Error')));
+
+            }
+
+    		return view('actividades.nuevo', ['seccion' => self::SECCION, 'productos' => $productos, 'actividad' => $actividad, 'ruta' => $ruta, 'backroute' => $ruta, 'menu_list' => $mb->getMenu()]);
 
     	}elseif ($request->isMethod('post')) {
-    		
-    		if (!$request->has(['producto_id', 'codigo', 'descripcion', 'fuente_financiamiento', 'monto_presupuesto'])) {
-    			
-    			return view('alert', ['titulo' => 'Existe inconsistencia de datos', 'seccion' => $this->seccion, 'mensaje' => 'Los campos codigo, id de producto, monto y descripción son obligatorios.', 'funcionario' => $this->funcionario]);
-    		}else{
 
-    			$actividad = new Actividad;
+            $request->validate([
+                'producto_id' => 'bail|integer|required',
+                'codigo' => 'alpha_dash|max:25|required',
+                'descripcion' => 'alpha_num|max:600|required',
+                'fuente_financiamiento' => 'alpha|present',
+                'monto_presupuesto' => 'numeric|present',
+                'monto_aprobado' => 'numeric|present',
+                'monto_disponible' => 'numeric|present',
+            ]);
 
-    			$actividad->codigo = $request->codigo;
-    			$actividad->descripcion = $request->descripcion;
-    			$actividad->fuente_financiamiento = $request->fuente_financiamiento;
-    			$actividad->monto_presupuesto = $request->monto_presupuesto;
+            try {
 
-    			$producto->actividades()->save($actividad);
+                $actividad = Actividad::create($request->input());
+                
+            } catch (Exception $e) {
 
-    			return redirect()->route('IndiceActividades', ['id' => $id]);
+                error_log('Excepción al ingresar Actividad. '.$e->getMessage());
 
-    		}
+                toastr()->error(__('messages.critical_error'), strtoupper(__('Operation Error')));
+
+                return redirect()->route('error');
+                
+            }
+
+            
+            toastr()->success(__('messages.registration_success'), strtoupper(__('Operation Success')));
+
+            return redirect()->route('VerActividad', ['id' => $actividad->id]);
+
     	}
     }
 
-    public function ver($id, $id_act){
+    public function ver(MenuBuilder $mb, $id){
 
-    	$producto = Producto::findOrFail($id);
+    	$actividad = Actividad::findOrFail($id);
 
-    	$actividad = $producto->actividades->find($id_act)->get();
+        $params = ['id' => $id];
 
-    	return view('mpmp.detalle_actividad', ['titulo' => 'Detalle de Actividad', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'producto' => $producto, 'actividad' => $actividad]);
+        $ruta = route('VerActividad', $params);
+
+        $ruta_edit = route('EditarActividad', $params);
+
+        $ruta_approve = route('AccionActividad', ['id' => $id, 'accion' => 'aprobar']);
+
+        $ruta_cancel = route('AccionActividad', ['id' => $id, 'accion' => 'cancelar']);
+
+        //$ruta_execute = route('AccionActividad', ['id' => $id, 'accion' => 'ejecutar'])
+
+        $ruta_delete = route('EliminarActividad', $params);
+
+        $ruta_anular_informe = route('AnularInformeActividad', $params);
+
+        $datos = ['seccion' => self::SECCION, 'actividad' => $actividad, 'backroute' => $ruta, 'ruta_edit' => $ruta_edit, 'ruta_approve' => $ruta_approve, 'ruta_cancel' => $ruta_cancel, 'ruta_delete' => $ruta_delete, 'menu_list' => $mb->getMenu()];
+
+    	return view('actividades.detalle', $datos);
 
     }
 
-    public function editar(Request $request, $id, $id_act){
+    public function editar(Request $request, MenuBuilder $mb, $id){
 
-    	$producto = Producto::findOrFail($id);
+    	$actividad = Actividad::findOrFail($id);
 
     	if($request->isMethod('get')){
 
-    		$actividad = $producto->actividades->find($id_act)->get();
+            $ruta = route('EditarActividad', ['id' => $id]);
 
-    		return view('mpmp.formulario_actividad', ['titulo' => 'Nueva Actividad del producto', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'producto' => $producto, 'actividad' => $actividad]);
+    		if (!$request->session()->has('errors')) {
+                
+                toastr()->info(__('messages.required_fields'));
+
+            } else {
+
+                toastr()->error(__('messages.validation_error'), strtoupper(__('Validation Error')));
+            }
+
+            $datos = ['seccion' => self::SECCION, 'actividad' => $actividad, 'ruta' => $ruta, 'backroute' => $ruta, 'menu_list' => $mb->getMenu()];
+
+    		return view('actividades.editar', $datos);
 
     	}else if($request->isMethod('post')){
 
-    		if (!$request->has(['producto_id', 'codigo', 'descripcion', 'fuente_financiamiento', 'monto_presupuesto'])) {
-    			
-    			return view('alert', ['titulo' => 'Existe inconsistencia de datos', 'seccion' => $this->seccion, 'mensaje' => 'Los campos codigo, id de producto, monto y descripción son obligatorios.', 'funcionario' => $this->funcionario]);
-    		}else{
+            $request->validate([
+                'producto_id' => 'bail|integer|required',
+                'codigo' => 'alpha_dash|max:25|required',
+                'descripcion' => 'alpha_num|max:600|required',
+                'fuente_financiamiento' => 'alpha|present',
+                'monto_presupuesto' => 'numeric|present',
+                'monto_aprobado' => 'numeric|present',
+                'monto_disponible' => 'numeric|present',
+            ]);
 
-    			$actividad = new Actividad;
+            try {
 
-    			$actividad->codigo = $request->codigo;
-    			$actividad->descripcion = $request->descripcion;
-    			$actividad->fuente_financiamiento = $request->fuente_financiamiento;
-    			$actividad->monto_presupuesto = $request->monto_presupuesto;
+                $actividad->fill($request->input());
 
-    			$actividad->save();
+                $actividad->save();
+                
+            } catch (Exception $e) {
+                
+                error_log('Excepción al actualizar Actividad. '.$e->getMessage());
 
-    			return redirect()->route('IndiceActividades', ['id' => $id]);
-    		}
+                toastr()->error(__('messages.critical_error'), strtoupper(__('Operation Error')));
+
+                return redirect()->route('error');
+            }
+
+            toastr()->success(__('messages.update_success'), strtoupper(__('Operation Success')));
+
+            return redirect()->route('VerActividad', ['id' => $id]);
+            
     	}
     }
 
-    public function acciones(Request $request, $id, $id_act){
+    public function acciones(Request $request, $id, $accion){
 
-    	$url = $request->url();
+        function unauthorized(){
 
-    	$accion = strtolower(explode("/", $url)[-1]);
+            toastr()->error(__('messages.unauthorized_operation'));
 
-    	$producto = Producto::findOrFail($id);
+            return redirect()->route('ListaActividades');
 
-    	$actividad = $producto->actividades->find($id_act);
+        }
 
-    	switch ($accion) {
+    	$funcionario = Auth::user()->funcionario;
+
+    	$actividad = Actividad::findOrFail($id);
+
+    	switch (strtolower($accion)) {
     		case 'aprobar':
-    			$actividad->aprobada = true;
+                if($funcionario->tienePermiso('aprobar_actividades')){
+                    $actividad->aprobada = true;
+                }else{
+
+                    unauthorized();
+                }
     			break;
     		case 'cancelar':
-    			$actividad->cancelada = true;
+                if($funcionario->tienePermiso('cancelar_actividades')){
+                    $actividad->cancelada = true;
+                }else{
+
+                    unauthorized();
+                }
     			break;
+                /*
     		case 'ejecutar':
-    			$actividad->ejecutada = true;
+                if($funcionario->tienePermiso('ejecutar_actividades')){
+                    $actividad->ejecutada = true;
+                }else{
+
+                    unauthorized();
+                }
     			break;
+                */
     		default:
+                toastr()->error(__('messages.unauthorized_operation'), strtoupper(__('unauthorized operation')));
+
     			return redirect()->route('error');
     			break;
     	}
 
         $actividad->save();
 
+        if(strtolower($accion) === 'ejecutar'){
+            return redirect()->route('InformeActividad', ['id' => $id]);
+        }
+
     	return redirect()->route('IndiceActividades', ['id' => $id])
     }
 
-    public function eliminar(Request $request, $id, $id_act){
+    /**
+    *
+    * Función del controlador para dar una actividad 
+    * por ejecutada de acuerdo al plan donde fue programada.
+    *
+    */
 
-    	if($request->isMethod('get')){
+    public function ejecutar(Request $request, MenuBuilder $mb, $pid, $id){
 
-    		$ruta = route('EliminarActividad', ['id' => $id, 'id_act' => $id_act]);
+        $actividad = Actividad::findOrFail($id);
 
-    		return view('alert', ['titulo' => 'Eliminar Actividad', 'seccion' => $this->seccion, 'mensaje' => 'Se eliminará el registro de la base de datos permanentemente.', 'route' => $ruta, 'funcionario' => $this->funcionario]);
+        $plan = Plan::findOrFail($pid);
+
+        if ($request->isMethod('get')) {
             
-    	}else if($request->isMethod('post')){
+            $claves_insumos = DB::table('actividad_insumo')->select('id')->where('actividad_id', $actividad->id)->toArray();
 
-    		Actividad::destroy($id_act);
+            $solicitudes = DB::table('solicituds')->select('id')->whereIn('actividad_insumo_id', $claves_insumos)->where('procesado', true);
 
-    		return redirect()->route('IndiceActividades', ['id' => $id]);
+            // Verifica que si la actividad tiene solicitudes.
+            // Si hay solicitudes de insumos. Debe haber un informe de rendición.
+            // Si hay solicitudes sin informe, se redirige para
+            // ingresar el informe de rendición correspondiente
+            // antes de modificar la actividad.
+            if ($solicitudes->count() > 0 && $actividad->informe->count() == 0) {
+                
+                toastr()->info(__('messages.no_report_activity'));
 
-    	}
+                return redirect()->route('InformeActividad', ['id' => $id, 'pid' => $pid]);
 
+            }
+
+            $ruta = route('EjecutarActividad', ['id' => $id, 'pid' => $pid]);
+
+            $datos = ['seccion' => self::SECCION, 'actividad' => $actividad, 'plan' => $plan, 'ruta' => $ruta, 'backroute' => $ruta, 'menu_list' => $mb->getMenu()];
+
+            if (!$request->session()->has('errors')) {
+                
+                toastr()->info(__('messages.required_fields'));
+
+            } else {
+
+                toastr()->error(__('messages.validation_error'), strtoupper(__('Operation Error')));
+            }
+
+            return view('actividades.ejecutar', $datos);
+
+        } elseif ($request->isMethod('post')) {
+            
+            $request->validate([
+                'actividad_id' => 'bail|integer|required',
+                'fecha_ejecutada' => 'date|required',
+            ]);
+
+            $fecha_ejecutada = $request->fecha_ejecutada;
+
+            $actividad->ejecutada = true;
+
+            $actividad->planes()->updateExistingPivot($pid, ['ejecutada' => true, 'fecha_ejecutada' => $fecha_ejecutada]);
+
+            toastr()->success(__('messages.update_success'), strtoupper(__('Operation Success')));
+
+            return redirect()->route('VerPlan', ['id' => $pid]);
+
+        }
 
     }
 
-    public function insumos(Request $request, $id, $id_act){
+    public function eliminar(Request $request, $id){
+
+    	if($request->isMethod('post')){
+
+            $actividad = Actividad::findOrFail($id);
+
+            $actividad->delete();
+
+    		//Actividad::destroy($id);
+
+    		return redirect()->route('ListaActividades');
+
+    	}
+
+    }
+
+    public function insumos(Request $request, MenuBuilder $mb, $id){
+
+        $actividad = Actividad::findOrFail($id);
+
+        $ruta = route('InsumosActividad', ['id' => $id]);
 
     	if ($request->isMethod('get')) {
-    		
-    		$ruta = route('InsumosActividad', ['id' => $id, 'id_act' => $id_act]);
+
+            $empty_rows = config('variables.extra_rows', 4);
 
     		$insumos = Insumo::all();
 
     		$unidades = UnidadMedida::all();
 
-    		return view('mpmp.insumos_actividad', ['titulo' => 'Asignación de Insumos Por Actividad', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'route' => $ruta, 'insumos' => $insumos, 'unidades' => $unidades]);
+            $datos = ['seccion' => self::SECCION, 'ruta' => $ruta, 'backroute' => $ruta, 'actividad' => $actividad, 'insumos' => $insumos, 'unidades' => $unidades, 'filas' => $empty_rows, 'menu_list' => $mb->getMenu()];
 
-    	}elseif ($request->isMethod('post')) {
+    		return view('actividades.insumos', $datos);
 
-    		if(!$request->has('actividad_id')){
-    			return view('alert', ['titulo' => 'Error de Datos', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'mensaje' => 'Existe inconsistencia en los datos. Revise y vuelva a intentarlo.']);
-    		}else{
+    	} else if ($request->isMethod('post')) {
 
-    			$actividad = Actividad::findOrFail($id_act);
+            if ($request->has('insumos')) {
+                
+                $datos = $request->insumos;
+                $filas = count($datos['insumo_id']);
+                $saved = 0;
 
-    			$datos = $request->input('insumos', null);
-
-    			$registrar = function($insumo_id, $unidad_medida_id, $costo_unitario, $cantidad){
-    				
-    				if ($insumo_id != null && $unidad_medida_id != null && $costo_unitario != null && $costo_unitario > 0 && $cantidad != null && $cantidad > 0) {
-
-    					$actividad->insumos()->attach($insumo_id, ['unidad_medida_id' => $unidad_medida_id, 'costo_unitario' => $costo_unitario, 'cantidad' => $cantidad]);
-
-    				}
-
-    			};
-
-    			if ($datos != null) {
-
-                    array_map($registrar, $datos['insumo_id'], $datos['unidad_medida_id'], $datos['costo_unitario'], $datos['cantidad']);
-
-                    return redirect()->route('VerActividad', ['id' => $id, 'id_act' => $id_act]);
+                for ($i=0; $i < $filas; $i++) { 
                     
-                }else{
+                    if (isset($datos['cantidad'][$i])) {
+                        
+                        try {
 
-                    return redirect()->route('error');
+                            $insumo = ['unidad_medida_id' => $datos['unidad_medida_id'][$i], 'costo_unitario' => $datos['costo_unitario'][$i], 'cantidad' => $datos['cantidad'][$i]];
+
+                            $actividad->insumos()->attach($datos['insumo_id'][$i], $insumo);
+                            
+                        } catch (Exception $e) {
+
+                            error_log("Excepción al registrar insumos para la actividad {$actividad->codigo}. ".$e->getMessage());
+
+                            toastr()->error(strtoupper(__('messages.critical_error')), strtoupper(__('Operation Error')));
+
+                            return redirect()->route('error');
+                            
+                        }
+
+                    } else {
+
+                        break;
+
+                    }
+                }
+
+                if ($saved > 0) {
+                    
+                    toastr()->success("{$saved} ".__('messages.records_saved'), strtoupper(__('Operation Success')));
+
+                } else {
+
+                    toastr()->info(__('messages.no_records_saved'));
 
                 }
-    		}
+
+                return redirect()->route('VerActividad', ['id' => $id]);
+
+            } else {
+
+                toastr()->error(__('messages.registration_error'), strtoupper(__('Operation Error')));
+
+
+                return redirect($ruta);
+
+            }
     		
     	}
     }
 
-    public function editar_insumos(Request $request, $id, $id_act){
+
+
+    public function editar_insumos(Request $request, MenuBuilder $mb, $id, $idd){
+
+        $actividad = Actividad::findOrFail($id);
+
 
     	if ($request->isMethod('get')) {
     		
-    		$ruta = route('EditarInsumosActividad', ['id' => $id, 'id_act' => $id_act]);
+    		$ruta = route('EditarInsumosActividad', ['id' => $id, 'idd' => $idd]);
 
-    		$actividad = Actividad::findOrFail($id_act);
-
-    		$insumos_actividad = $actividad->insumos;
-
-    		$insumos = Insumo::all();
+    		$insumo = $actividad->insumos->filter($idd);
 
     		$unidades = UnidadMedida::all();
 
-    		return view('mpmp.insumos_actividad', ['titulo' => 'Asignación de Insumos Por Actividad', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'route' => $ruta, 'insumos' => $insumos, 'unidades' => $unidades, 'insumos_actividad' => $insumos_actividad]);
+            $datos = ['seccion' => self::SECCION, 'ruta' => $ruta, 'backroute' => $ruta, 'insumo' => $insumo, 'unidades' => $unidades, 'actividad' => $actividad, 'menu_list' => $mb->getMenu()];
 
-    	}elseif ($request->isMethod('post')) {
+            if (!$request->session()->has('errors')) {
+                
+                toastr()->info(__('messages.required_fields'));
 
-    		if(!$request->has('actividad_id')){
-    			return view('alert', ['titulo' => 'Error de Datos', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'mensaje' => 'Existe inconsistencia en los datos. Revise y vuelva a intentarlo.']);
-    		}else{
+            } else {
 
-    			$actividad = Actividad::findOrFail($id_act);
+                toastr()->error(__('messages.validation_error'), strtoupper(__('Validation Error')));
 
-    			$datos = $request->input('insumos', null);
+            }
 
-    			$registrar = function($insumo_id, $unidad_medida_id, $costo_unitario, $cantidad){
-    				
-    				if ($insumo_id != null && $unidad_medida_id != null && $costo_unitario != null && $costo_unitario > 0 && $cantidad != null && $cantidad > 0) {
+    		return view('actividades.editar_insumo', $datos);
 
-    					/** El insumo ya existe, se modifica el dato quitando el registro
-    					* de la tabla de unión y se vuelve agregar con los nuevos datos.
-    					* Si el insumo no existe, se inserta el nuevo registro en la tabla de
-    					* unión.
-    					*/
+    	}else if ($request->isMethod('post')) {
 
-    					if($actividad->insumos()->where('id', $insumo_id)->get() != null){
+            $request->validate([
+                'unidad_medida_id' => 'bail|integer|required',
+                'costo_unitario' => 'numeric|required',
+                'cantidad' => 'numeric|required',
+            ]);
 
-    						$actividad->insumos()->dettach($insumo_id);
+            $attrs = ['unidad_medida_id' => $request->unidad_medida_id, 'costo_unitario' => $request->costo_unitario, 'cantidad' => $request->cantidad];
 
-    						$actividad->insumos()->attach($insumo_id, ['unidad_medida_id' => $unidad_medida_id, 'costo_unitario' => $costo_unitario, 'cantidad' => $cantidad]);
+            $actividad->insumos()->updateExistingPivot($idd, $attrs);
 
-    					}else{
+    		toastr()->success(__('messages.update_success'), strtoupper(__('Operation Success')));
 
-    						$actividad->insumos()->attach($insumo_id, ['unidad_medida_id' => $unidad_medida_id, 'costo_unitario' => $costo_unitario, 'cantidad' => $cantidad]);
-
-    					}
-
-    				}
-
-    			};
-
-                if ($datos != null) {
-
-                    array_map($registrar, $datos['insumo_id'], $datos['unidad_medida_id'], $datos['costo_unitario'], $datos['cantidad']);
-
-                    return redirect()->route('VerActividad', ['id' => $id, 'id_act' => $id_act]);
-
-                }else{
-
-                    return redirect()->route('error');
-
-                }
-
-    			
-    		}
+            return redirect()->route('VerActividad', ['id' => $id]);
     		
     	}
     }
 
     
 
-    public function informe($id, $id_act){
+    public function eliminar_insumos(Request $request, $id, $idd){
+
+        if ($request->isMethod('post')) {
+            
+            $actividad = Actividad::findOrFail($id);
+
+            try {
+
+                $actividad->insumos()->detach($idd);
+                
+            } catch (Exception $e) {
+
+                error_log("Excepción al retirar insumos de la actividad {$actividad->codigo} ".$e->getMessage());
+
+                toastr()->error(__('messages.critical_error'), strtoupper(__('Operation Error')));
+
+                return redirect()->route('error');
+                
+            }
+
+            toastr()->success(__('messages.update_success'));
+
+            return redirect->route('VerActividad', ['id' => $id]);
+
+        }
+    }
+
+    
+
+    public function informe(Request $request, MenuBuilder $mb, $id, $pid=null){
+
+        $actividad = Actividad::findOrFail($id);
+
+        if ($actividad->ejecutada) {
+            
+            toastr()->error(__('messages.edit_executed_record'), strtoupper('error'));
+
+            return redirect()->route('VerActividad', ['id' => $id]);
+
+        }
+
+        if($actividad->cancelada || ($actividad->informe != null && $actividad->informe->filter('anulado', false) != null)){
+
+            toastr()->error('messages.unauthorized_operation');
+
+            return redirect()->route('VerActividad', ['id' => $id]);
+
+        }
+
+        $ruta = route('InformeActividad', ['id' => $id]);
+
+        if ($request->isMethod('get')) {
+
+            $datos = ['seccion' => self::SECCION, 'actividad' => $actividad, 'ruta' => $ruta, 'backroute' => $ruta, 'menu_list' => $mb->getMenu()];
+
+            if (!$request->session()->has('errors')) {
+                
+                toastr()->info(__('messages.required_fields'));
+
+            } else {
+
+                toastr()->error(__('messages.validation_error'), strtoupper(__('Validation Error')));
+
+            }
+
+            return view('actividades.informe', $datos);
+
+
+        } elseif ($request->isMethod('post')) {
+            
+            $request->validate([
+                'fecha_realizada' => 'bail|date|required',
+                'documento' => 'bail|file|mimes:pdf|required',
+                'foto' => 'image|dimensions:min_width=400,min_height=200|mimes:jpeg,jpg,png|nullable',
+                'dificultades' => 'alpha_dash|max:1000|present',
+                'soluciones' => 'alpha_dash|max:1000|present',
+                'observaciones' => 'alpha_dash|max:1000|present',
+                'beneficiarios_directos' => 'numeric|required',
+                'beneficiarios_indirectos' => 'numeric|required',
+                'hombres' => 'numeric|required',
+                'mujeres' => 'numeric|required',
+                'ninos' => 'numeric|required',
+                'ninas' => 'numeric|required',
+                'jovenes_m' => 'numeric|nullable',
+                'jovenes_f' => 'numeric|nullable',
+                'adulto_mayor_m' => 'numeric|nullable',
+                'adulto_mayor_f' => 'numeric|nullable',
+                'discapacitados' => 'numeric|nullable',
+            ]);
+
+            try {
+
+                $informe = Informe::create($request->input());
+
+                if ($request->hasFile('documento')) {
+                    
+                    $path_documento = $request->documento->store('docs');
+
+                    $documento = Documento::create([
+                        'nombre' => "Informe de actividad - {$actividad->codigo}",
+                        'url' => $path_documento,
+                        'descripcion' => "Documento de informe de la actividad '{$actividad->descripcion}'",
+                        'tipo' => 'pdf',
+                    ]);
+
+                    $informe->documento()->associate($documento);
+
+                } elseif ($request->hasFile('foto')) {
+                    
+                    $path_foto = $request->foto->store('fotos');
+
+                    $foto = Foto::create([
+                        'nombre' => "Foto de actividad - {$actividad->codigo}",
+                        'url' => $path_foto,
+                        'descripcion' => $actividad->descripcion,
+                    ]);
+
+                    $informe->fotos()->attach($foto->id);
+                }
+                
+            } catch (Exception $e) {
+
+                error_log("Excepción al registrar datos de informe. ".$e->getMessage());
+
+                toastr()->error(__('messages.critical_error'), strtoupper(__('Operation Error')));
+
+                return redirect()->route('error');
+                
+            }
+
+
+            toastr()->success(__('messages.registration_success'), strtoupper(__('Operation Success')));
+
+            if($pid==null){
+
+                return redirect()->route('VerActividad', ['id' => $id]);
+
+            } else {
+
+                return redirect()->route('EjecutarActividad', ['id' => $id, 'pid' => $pid]);
+
+            }
+
+            
+
+
+        }
 
     }
 
-    public function documento_informe($id, $id_act, $tipo){
-    	
+    public function anular_informe($id){
+
+        $actividad = Actividad::findOrFail($id);
+
+        $informe = $actividad->informe;
+
+        $informe->anulado = true;
+
+        $informe->save();
+
+        toastr()->success(__('messages.update_success'));
+
+        return redirect()->route('VerActividad', ['id' => $id]);
     }
 
 }
