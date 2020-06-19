@@ -315,54 +315,75 @@ class PeriodoController extends Controller
     		// que ya fueron asociados al plan
     		
     		$resultados = collect([]);
+
     		$proyectos = $unidadGestion->proyectos()->where('ejecutado', false)->get();
+
+            if ($unidadGestion->programas->count() > 0) {
+                
+                foreach ($unidadGestion->programas as $programa) {
+                    
+                    $proyectos = $proyectos->union($programa->proyectos);
+
+                }
+
+            }
     		
             foreach ($proyectos as $proyecto) {
-                # code...
+                
+                $resultados = $resultados->union($proyecto->resultados);
+
             }
 
     		return view('mpmp.plan_resultados', ['titulo' => 'Resultados del Plan', 'seccion' => $this->seccion, 'funcionario' => $this->funcionario, 'plan' => $plan, 'resultados' => $resultados, 'por_proyecto' => $resultados_proyectos, 'por_programa' => $resultados_programas]);
 
 
-    	}elseif ($request->isMethod('post')) {
+    	} else if ($request->isMethod('post')) {
     		
-    		if ($request->has('datos_res')) {
-    			
-    			
+    		if ($request->has('resultados')) {
     				
-				$datos_res = $request->input('datos_res', null);
+				$datos = $request->input('resultados', null);
+
+                $insertados = 0;
+
+                $actualizados = 0;
 
     			//Función que recibe cada formulario con datos de post y asocia el resultado al plan
     			$registrar = function($resultado_id, $agregar=false){
 
-    				$resultado = $plan->resultados()->find($resultado_id);
+    				$resultado = $periodoUnidad->resultados->find($resultado_id);
 
-    				if ($resultado != null && !$agregar) {
+    				if ($resultado->count() > 0 && !$agregar) {
 
     					$plan->resultados()->dettach($resultado_id);
 
-    				}else if($resultado == null && $agregar){
+                        $actualizados++;
+
+    				}else if($resultado->count() == 0 && $agregar){
 
     					$plan->resultados()->attach($resultado_id);
+
+                        $insertados++;
 
     				}
     				
     				
     			};
 
-    			if ($datos_res != null) {
-    				
-    				array_map($registrar, $datos_res['resultado_id'], $datos_res['agregar']);
+                array_map($registrar, $datos['resultado_id'], $datos['agregar']);
 
-    				return redirect()->route('VerPlan', ['id' => $id]);
+                toastr()->success(__('messages.registration_success'), strtoupper(__('Operation Success')));
 
-    			}else{
+                toastr()->info("{$insertados} ".__('messages.records_saved'));
 
-    				return redirect()->route('error');
+                toastr()->info("{$actualizados} ".__('messages.records_updated'));
 
-    			}
+                return redirect()->route('VerPeriodoUnidad', ['id' => $id]);
+
+    			
 
     		}else{
+
+                toastr()->error(__('messages.unauthorized_operation'), strtoupper(__('unauthorized operation')));
 
     			return redirect()->route('error');
 
