@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Comunidad extends Model
 {
+
+	protected $guarded = ['id'];
+	
     public function municipio(){
     	return $this->belongsTo('App\Models\Municipio');
     }

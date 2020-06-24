@@ -19,7 +19,7 @@ class CreateComunidadsTable extends Migration
             $table->string('nombre', 100);
             $table->double('lat', 16, 6);
             $table->double('lng', 16, 6);
-            $table->point('punto')->nullable();
+            $table->point('punto')->nullable()->comment('Para uso en sistema SIG');
             $table->timestamps();
         });
     }

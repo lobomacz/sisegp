@@ -18,9 +18,9 @@ class CreateMunicipiosTable extends Migration
             $table->enum('region', ['raccn', 'raccs']);
             $table->string('nombre', 50);
             $table->string('nombre_corto', 10);
-            $table->float('poblacion_aprox', 8, 2);
-            $table->float('extension_km_2', 8, 2);
-            $table->polygon('mapa')->nullable();
+            $table->float('poblacion', 8, 2)->comment('Poblacion aproximada de fuente oficial.')->nullable();
+            $table->float('extension', 8, 2)->comment('En kilometros cuadrados.')->nullable();
+            $table->polygon('mapa')->nullable()->comment('Shape para uso en sistema SIG');
             $table->timestamps();
         });
     }

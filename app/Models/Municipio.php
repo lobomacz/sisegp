@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Municipio extends Model
 {
+	protected $guarded = ['id'];
+
     public function comunidades(){
     	return $this->hasMany('App\Models\Comunidad');
     }
